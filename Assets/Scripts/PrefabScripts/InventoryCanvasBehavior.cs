@@ -145,7 +145,7 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
     private void ItemsTabButtonClicked()
     {
-         ColorBlock colors = itemsTabButton.colors;
+        ColorBlock colors = itemsTabButton.colors;
         colors.selectedColor = itemsTabButton.colors.pressedColor;
         itemsTabButton.colors = colors;
         birdTabButton.image.color = originalButtonColor;
@@ -162,7 +162,8 @@ public class InventoryCanvasBehavior : MonoBehaviour
     private void BirdTabButtonClicked()
     {
         // Clear bird button notifications if they're still there
-        notificationMgr.ClearNotification(NotificationManager.newEggNotificationId);
+        notificationMgr.NotificationChange(NotificationManager.newEggNotificationId,
+                                           NotificationManager.CLEAR_NOTIFICATION);
 
         ColorBlock colors = birdTabButton.colors;
         colors.selectedColor = birdTabButton.colors.pressedColor;

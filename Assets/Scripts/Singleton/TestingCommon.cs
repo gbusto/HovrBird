@@ -1,5 +1,7 @@
 ﻿#define TESTING
 
+using System.Collections.Generic;
+
 #if TESTING
 public static class TestingCommon
 {
@@ -25,10 +27,15 @@ public static class TestingCommon
     public static void GetAllCollectibles()
     {
         InventoryData data = InventoryData.Instance();
-        data.UpdateItemCount(InventoryData.coinKey, 1000);
-        data.UpdateItemCount(InventoryData.bananaKey, 1000);
-        data.UpdateItemCount(InventoryData.blueberryKey, 1000);
-        data.UpdateItemCount(InventoryData.strawberryKey, 1000);
+
+        Dictionary<string, int> currencyDict = new Dictionary<string, int>
+        {
+            [InventoryData.coinKey] = 1000,
+            [InventoryData.bananaKey] = 1000,
+            [InventoryData.blueberryKey] = 1000,
+            [InventoryData.strawberryKey] = 1000
+        };
+        data.AddCurrency(currencyDict);
 
         data.SaveUserData();
     }

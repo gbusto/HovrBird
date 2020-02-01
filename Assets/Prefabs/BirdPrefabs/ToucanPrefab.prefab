@@ -72,7 +72,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 899700fb6e1274eae83d98cc5087f61c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b42c089ff88cc41af8bfde407cca7f62, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -116,15 +116,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe3453554fb04ea3aa1fb7a7f4be93a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  birdNormal: {fileID: 21300000, guid: 899700fb6e1274eae83d98cc5087f61c, type: 3}
-  birdFlap: {fileID: 21300000, guid: abeba49b654d845febb05dee1436cf9d, type: 3}
+  birdNormal: {fileID: 21300000, guid: b42c089ff88cc41af8bfde407cca7f62, type: 3}
+  birdFlap: {fileID: 21300000, guid: 29919944cddd845cba613ce688cc0011, type: 3}
   commonObject: {fileID: 0}
   commonScript: {fileID: 0}
   startGame: 0
   fly: 0
   triggerCollision: 0
   triggerCollisionTag: 
-  collisionOccurred: 0
   collisionTag: 
   enableCollisions: 1
   flyForce: 6
@@ -146,7 +145,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 9.61, y: 5.58}
+    oldSize: {x: 9.66, y: 5.58}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

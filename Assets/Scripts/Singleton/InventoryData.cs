@@ -53,7 +53,8 @@ public class InventoryData
 
     private InventoryDataStruct inventoryData;
 
-    private bool wasEggAddedToInventory;
+    private NotificationManager notificationMgr;
+
 
     private static byte[] key = {
         0x9c, 0xdb, 0xa3, 0xcb, 0xa9, 0x0b, 0xf1, 0x04, 0xc3, 0xb8, 0x79, 0x85, 0xb8, 0x22, 0xf8, 0x57
@@ -94,6 +95,7 @@ public class InventoryData
         if (null == _instance)
         {
             _instance = LoadUserData();
+            _instance.notificationMgr = NotificationManager.Instance();
         }
 
         return _instance;
@@ -172,6 +174,13 @@ public class InventoryData
 
     public void AddCurrency(Dictionary<string, int> currencyDict)
     {
+        if (false == PlayerPrefsCommon.GetFirstItemsCollected())
+        {
+            MonoBehaviour.print("Notifying for first items collected!");
+            notificationMgr.NotificationChange(NotificationManager.firstTimeItemsNotificationId,
+                                               NotificationManager.SHOW_NOTIFICATION);
+        }
+
         foreach (KeyValuePair<string, int> currency in currencyDict)
         {
             if (collectibleDict.ContainsKey(currency.Key))
@@ -181,6 +190,19 @@ public class InventoryData
                 if (firebaseCurrencyName.Length > 0)
                 {
                     FirebaseManager.LogEarnVirtualCurrencyEvent(firebaseCurrencyName, currency.Value);
+                }
+            }
+        }
+
+        foreach (KeyValuePair<uint, bool> bird in birdDict)
+        {
+            if (UNHATCHED == bird.Value)
+            {
+                if (CanHatchEggWithId(bird.Key))
+                {
+
+                    notificationMgr.NotificationChange(NotificationManager.canHatchNotificationId,
+                                                       NotificationManager.SHOW_NOTIFICATION);
                 }
             }
         }
@@ -210,20 +232,10 @@ public class InventoryData
     {
         if (false == birdDict.ContainsKey(id))
         {
+            notificationMgr.NotificationChange(NotificationManager.newEggNotificationId,
+                                               NotificationManager.SHOW_NOTIFICATION);
             birdDict[id] = UNHATCHED;
-            wasEggAddedToInventory = true;
         }
-    }
-
-    public bool NotifyForNewEgg()
-    {
-        if (wasEggAddedToInventory)
-        {
-            wasEggAddedToInventory = false;
-            return true;
-        }
-
-        return false;
     }
 
     public bool IsBirdInInventory(uint id)
@@ -258,6 +270,9 @@ public class InventoryData
                 switch (id)
                 {
                     case SAM_ID:
+                        notificationMgr.NotificationChange(NotificationManager.canHatchNotificationId,
+                                   NotificationManager.CLEAR_NOTIFICATION);
+
                         FirebaseManager.LogUnlockAchievementEvent(FirebaseManager.ACHIEVEMENT_ID_HATCH_SAM);
                         break;
 
@@ -277,7 +292,7 @@ public class InventoryData
             Dictionary<string, int> reqsDict = GetRequirementForId(id);
             foreach (KeyValuePair<string, int> req in reqsDict)
             {
-                if (inventoryData.collectibleDict[req.Key] < reqsDict[req.Key])
+                if (collectibleDict[req.Key] < reqsDict[req.Key])
                 {
                     return false;
                 }

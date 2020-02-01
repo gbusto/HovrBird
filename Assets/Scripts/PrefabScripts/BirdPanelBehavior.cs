@@ -255,7 +255,8 @@ public class BirdPanelBehavior : MonoBehaviour
 
     private void HatchButtonClicked()
     {
-        notificationMgr.ClearNotification(NotificationManager.canHatchNotificationId);
+        notificationMgr.NotificationChange(NotificationManager.canHatchNotificationId,
+                                           NotificationManager.CLEAR_NOTIFICATION);
 
         /*
          * 1. Change the bird sprite to the appropriate bird sprite

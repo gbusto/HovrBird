@@ -27,6 +27,9 @@ public class NotificationManager
     // User collected items for the first time (show only once)
     public const uint firstTimeItemsNotificationId = 0x3;
 
+    public const bool CLEAR_NOTIFICATION = false;
+    public const bool SHOW_NOTIFICATION = true;
+
     private NotificationDataStruct notificationsData;
 
     private const string dataFilename = "h3qck1rwourh.hb";
@@ -83,6 +86,7 @@ public class NotificationManager
 
     public void SaveUserData()
     {
+        /* XXX Uncomment when this is being worked on again
         notificationsData.notifications = notifications;
 
         string fullPath = GetFullPath();
@@ -95,6 +99,7 @@ public class NotificationManager
             byte[] serializedData = memStream.ToArray();
             EncryptedDataManager.WriteData(fullPath, key, iv, serializedData);
         }
+        */
     }
 
     // Marked private because this should only be called via the Instance() method
@@ -145,14 +150,22 @@ public class NotificationManager
 
     public void Subscribe(uint key, GameObject obj)
     {
+        /* XXX Uncomment when this is being worked on again
         if (subscriptions.ContainsKey(key))
         {
             subscriptions[key].Add(obj);
+
+            if (notifications[key])
+            {
+                obj.SetActive(true);
+            }
         }
+        */
     }
 
     public void Unsubscribe(uint key, GameObject obj)
     {
+        /* XXX Uncomment when this is being worked on again
         if (null != obj)
         {
             if (subscriptions.ContainsKey(key))
@@ -161,54 +174,26 @@ public class NotificationManager
                 subscriptions[key].Remove(obj);
             }
         }
+        */
     }
 
-    // Functions to run notification checks
-    public void RunNotificationCheck()
+    public void NotificationChange(uint key, bool notify)
     {
-        CheckForNewEggs();
-        CheckForEggHatch();
-        CheckForNewItems();
-
         PurgeNullObjects();
 
-        Notify();
-    }
-
-    public void ClearNotification(uint key)
-    {
         if (notifications.ContainsKey(key))
         {
+            notifications[key] = notify;
+
             if (notifications[key] && key == firstTimeItemsNotificationId)
             {
                 // Prevent this notification from being shown again in the future
                 PlayerPrefsCommon.SetFirstItemsCollected(true);
             }
 
-            notifications[key] = false;
-
             foreach (GameObject obj in subscriptions[key])
             {
-                obj.SetActive(false);
-            }
-        }
-
-        SaveUserData();
-    }
-
-    private void Notify()
-    {
-        foreach (KeyValuePair<uint, bool> notification in notifications)
-        {
-            if (notification.Value)
-            {
-                foreach (GameObject obj in subscriptions[notification.Key])
-                {
-                    if (false == obj.activeInHierarchy)
-                    {
-                        obj.SetActive(true);
-                    }
-                }
+                obj.SetActive(notify);
             }
         }
     }
@@ -229,60 +214,6 @@ public class NotificationManager
             foreach (GameObject go in nulls)
             {
                 set.Remove(go);
-            }
-        }
-    }
-
-    private void CheckForNewEggs()
-    {
-        if (inventoryData.NotifyForNewEgg())
-        {
-            notifications[newEggNotificationId] = true;
-        }
-    }
-
-    private void CheckForEggHatch()
-    {
-        /*
-         * 1. Search for locked egg items
-         * 2. Get item count requirements
-         * 3. Search inventory data to see if the user has enough for each requirement
-         */
-        foreach (KeyValuePair<uint, bool> bird in inventoryData.birdDict)
-        {
-            if (InventoryData.UNHATCHED == bird.Value)
-            {
-                bool reqsMet = true;
-                Dictionary<string, int> reqsDict = InventoryData.GetRequirementForId(bird.Key);
-                foreach (KeyValuePair<string, int> req in reqsDict)
-                {
-                    if (inventoryData.collectibleDict[req.Key] < reqsDict[req.Key])
-                    {
-                        reqsMet = false;
-                    }
-                }
-
-                if (reqsMet)
-                {
-                    notifications[canHatchNotificationId] = true;
-                }
-            }
-        }
-    }
-
-    private void CheckForNewItems()
-    {
-        if (PlayerPrefsCommon.GetFirstItemsCollected())
-        {
-            // Don't run this check if this notification has already been shown and dismissed
-            return;
-        }
-        foreach (KeyValuePair<string, int> item in inventoryData.collectibleDict)
-        {
-            if (item.Value > 0)
-            {
-                notifications[firstTimeItemsNotificationId] = true;
-                break;
             }
         }
     }

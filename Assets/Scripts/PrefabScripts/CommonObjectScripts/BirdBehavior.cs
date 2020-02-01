@@ -186,7 +186,11 @@ public class BirdBehavior : MonoBehaviour
         if (triggerCollisionTags.Contains(other.gameObject.tag))
         {
             commonScript.TriggerCollisionOccurred(other.gameObject);
-            other.gameObject.GetComponent<PolygonCollider2D>().enabled = false;
+            PolygonCollider2D pc = other.gameObject.GetComponent<PolygonCollider2D>();
+            if (null != pc)
+            {
+                pc.enabled = false;
+            }
         }
     }
 
