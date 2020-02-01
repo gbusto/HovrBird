@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1007214683477",
+    "firebase_url": "https://unity-mobile-games.firebaseio.com",
+    "project_id": "unity-mobile-games",
+    "storage_bucket": "unity-mobile-games.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007214683477:android:2ad2056712634177f87bdc",
+        "android_client_info": {
+          "package_name": "xyz.ashgames.hovrbird"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007214683477-laf25eoobb92fnsd31kcsd0b034sdal3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOAxosBfkdahtMKyLP5WFlyfcpV9_2Z0Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007214683477-laf25eoobb92fnsd31kcsd0b034sdal3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1007214683477-h6u3b9dd6rtuckdt7r63v8i9obvmas51.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "xyz.ashgames.hovrbird"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

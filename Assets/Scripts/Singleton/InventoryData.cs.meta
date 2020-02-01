@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 596162d4b2fec47588b57d5fbda0b7e8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - kokoPrefab: {fileID: 866947939758040446, guid: 9d886b220b46b4a749b38438eff4e5b2,
+      type: 3}
+  - samPrefab: {fileID: 626632475567629868, guid: 153369d1c75e247ad835849d0d8d28f1,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
