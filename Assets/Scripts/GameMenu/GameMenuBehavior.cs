@@ -104,6 +104,11 @@ public class GameMenuBehavior : MonoBehaviour
 #endif
     }
 
+    public void OnApplicationQuit()
+    {
+        notificationMgr.SaveUserData();
+    }
+
     public void ClassicButtonClicked()
     {
         // Set the level number to 0 in level manager
@@ -120,7 +125,8 @@ public class GameMenuBehavior : MonoBehaviour
     public void InventoryButtonClicked()
     {
         // Clear the notification for first items collected if it's showing
-        notificationMgr.ClearNotification(NotificationManager.firstTimeItemsNotificationId);
+        notificationMgr.NotificationChange(NotificationManager.firstTimeItemsNotificationId,
+                                           NotificationManager.CLEAR_NOTIFICATION);
 
         inventoryCanvas.gameObject.SetActive(true);
     }

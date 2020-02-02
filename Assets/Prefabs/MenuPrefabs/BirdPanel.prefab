@@ -1064,8 +1064,8 @@ MonoBehaviour:
   eggHatchingDisplay: {fileID: 6515392760144143002}
   videoPlayer: {fileID: 6533974125600358232}
   mysterySprite: {fileID: 21300000, guid: 69155c6f12f5542909bfd2d581416f31, type: 3}
-  lockedEggSprite: {fileID: 21300000, guid: 4bb0b3abeacbb431eaf8c6332b25b05e, type: 3}
-  unlockedEggSprite: {fileID: 21300000, guid: 2f6a99cfeb8444de0b4d2b9211e6e3b8, type: 3}
+  lockedEggSprite: {fileID: 21300000, guid: a606cd878e9a64b198ff42380aa1b0d2, type: 3}
+  unlockedEggSprite: {fileID: 21300000, guid: f7b44dbac2fc14839a2b93f0ed58ea93, type: 3}
   birdImage: {fileID: 3007677852777676663}
   birdNameText: {fileID: 5562617758529273812}
   birdButton: {fileID: 3747458187157689075}

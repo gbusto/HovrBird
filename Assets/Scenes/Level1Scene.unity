@@ -1181,7 +1181,7 @@ MonoBehaviour:
     type: 3}
   collectibleItem4Sprite: {fileID: 21300000, guid: d3a317454021a43eb83358b470d0316c,
     type: 3}
-  eggSprite: {fileID: 21300000, guid: e4661acef0ec4435c9e6c5cd228c583f, type: 3}
+  eggSprite: {fileID: 21300000, guid: f7b44dbac2fc14839a2b93f0ed58ea93, type: 3}
   eggPrefab: {fileID: 7112239688589263297, guid: 67f84401fa17f48a0b8b53c629acb859,
     type: 3}
 --- !u!1 &2025784802

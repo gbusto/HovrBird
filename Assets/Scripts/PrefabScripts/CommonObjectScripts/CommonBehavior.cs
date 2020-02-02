@@ -359,7 +359,11 @@ public class CommonBehavior : MonoBehaviour
     private void InventoryButtonClicked()
     {
         // Clear the notification for first items collected if it's showing
-        notificationMgr.ClearNotification(NotificationManager.firstTimeItemsNotificationId);
+        if (notificationMgr.notifications[NotificationManager.firstTimeItemsNotificationId])
+        {
+            notificationMgr.NotificationChange(NotificationManager.firstTimeItemsNotificationId,
+                                               NotificationManager.CLEAR_NOTIFICATION);
+        }
 
         inventoryCanvas.gameObject.SetActive(true);
     }
@@ -419,8 +423,6 @@ public class CommonBehavior : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        notificationMgr.RunNotificationCheck();
-
         Touch screenTap;
         bool mouseClick = false;
         switch (state)
