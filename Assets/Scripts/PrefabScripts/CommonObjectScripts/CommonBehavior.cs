@@ -105,7 +105,7 @@ public class CommonBehavior : MonoBehaviour
     private readonly int interstitialThreshold = 3;
 
     // This needs to be set to false to enable real ads
-    private readonly bool TESTING = true;
+    private readonly bool TESTING = false;
 
     private NotificationManager notificationMgr;
 
@@ -353,7 +353,7 @@ public class CommonBehavior : MonoBehaviour
             if (false == PlayerPrefsCommon.GetUncommonFruitNew())
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissUncommonFruitPopupClicked);
-                string message = "Level 3 introduces an uncommon fruit: blueberries.\n\n";
+                string message = "Level 3 introduces a new fruit: blueberries.\n\n";
                 message += "Continue to catch as many coins, bananas, and blueberries as you can!";
                 hintMessageCanvasScript.ShowMessage(message);
             }
@@ -562,7 +562,7 @@ public class CommonBehavior : MonoBehaviour
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissCollectedFirstEggPopupClicked);
                 string message = "You caught your first egg!\n\n";
-                message += "View the requirements for hatching the egg in your inventory Birds tab.";
+                message += "View the requirements for hatching the egg in your inventory by clicking the Birds tab.";
                 hintMessageCanvasScript.ShowMessage(message);
             }
         }
@@ -631,7 +631,6 @@ public class CommonBehavior : MonoBehaviour
         }
         else if (obj.tag == "Collectible")
         {
-            print("Common: Adding object to queue with name " + obj.name);
             IncrementScore();
             itemsCollected.Enqueue(obj);
         }

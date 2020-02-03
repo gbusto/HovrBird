@@ -193,15 +193,12 @@ public class LevelData
     private static string GetFullPath()
     {
         string directory = NativeMobileStorage.GetApplicationDirectory();
-        MonoBehaviour.print("Unity: Checking if adventure mode directory exists at '" + directory + "'...");
         if (false == Directory.Exists(directory))
         {
-            MonoBehaviour.print("Unity: Directory didn't exist! Creating it at: '" + directory + "'...");
             Directory.CreateDirectory(directory);
         }
 
         string fullPath = Path.Combine(directory, dataFilename);
-        MonoBehaviour.print("Unity: Full path for adventure mode sky series: '" + fullPath + "'");
 
         return fullPath;
     }

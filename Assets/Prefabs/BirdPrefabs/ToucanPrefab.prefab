@@ -72,12 +72,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: b42c089ff88cc41af8bfde407cca7f62, type: 3}
+  m_Sprite: {fileID: 21300000, guid: d027081e750904c4e958bacd1495002a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 9.63, y: 5.59}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -116,9 +116,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbe3453554fb04ea3aa1fb7a7f4be93a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  birdNormal: {fileID: 21300000, guid: b42c089ff88cc41af8bfde407cca7f62, type: 3}
-  birdFlap: {fileID: 21300000, guid: 29919944cddd845cba613ce688cc0011, type: 3}
-  commonObject: {fileID: 0}
+  birdNormal: {fileID: 21300000, guid: d027081e750904c4e958bacd1495002a, type: 3}
+  birdFlap: {fileID: 21300000, guid: e22c84cfbaa5940758e60090a082648a, type: 3}
+  commonObject: {fileID: 6122329820804600070, guid: 8310485416b254ca7abd477379c98c0c,
+    type: 3}
   commonScript: {fileID: 0}
   startGame: 0
   fly: 0
@@ -146,7 +147,7 @@ PolygonCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 9.66, y: 5.58}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 9.63, y: 5.59}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
