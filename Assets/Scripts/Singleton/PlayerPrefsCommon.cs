@@ -13,6 +13,9 @@ public class PlayerPrefsCommon
     private const string uncommonFruitNewKey = "UncommonFruitNew";
     private const string rareFruitNewKey = "RareFruitNew";
     private const string collectedFirstEggKey = "CollectedFirstEgg";
+    private const string howtoPlayClassicKey = "HowtoPlayClassic";
+    private const string moreToComeKey = "MoreToCome";
+    private const string userIsOfflineKey = "UserIsOffline";
 
     /*
      * Functions to handle the egg highlight setting;
@@ -225,6 +228,74 @@ public class PlayerPrefsCommon
         return 1 == PlayerPrefs.GetInt(collectedFirstEggKey);
     }
 
+
+    public static void SetHowtoPlayClassic(bool b)
+    {
+        if (b)
+        {
+            PlayerPrefs.SetInt(howtoPlayClassicKey, 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt(howtoPlayClassicKey, 0);
+        }
+    }
+
+    public static bool GetHowtoPlayClassic()
+    {
+        if (false == PlayerPrefs.HasKey(howtoPlayClassicKey))
+        {
+            SetHowtoPlayClassic(false);
+        }
+
+        return 1 == PlayerPrefs.GetInt(howtoPlayClassicKey);
+    }
+
+
+    public static void SetMoreToCome(bool b)
+    {
+        if (b)
+        {
+            PlayerPrefs.SetInt(moreToComeKey, 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt(moreToComeKey, 0);
+        }
+    }
+
+    public static bool GetMoreToCome()
+    {
+        if (false == PlayerPrefs.HasKey(moreToComeKey))
+        {
+            SetMoreToCome(false);
+        }
+
+        return 1 == PlayerPrefs.GetInt(moreToComeKey);
+    }
+
+
+    public static void SetUserIsOffline(bool b)
+    {
+        if (b)
+        {
+            PlayerPrefs.SetInt(userIsOfflineKey, 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt(userIsOfflineKey, 0);
+        }
+    }
+
+    public static bool GetUserIsOffline()
+    {
+        if (false == PlayerPrefs.HasKey(userIsOfflineKey))
+        {
+            SetUserIsOffline(false);
+        }
+
+        return 1 == PlayerPrefs.GetInt(userIsOfflineKey);
+    }
 
     /*
      * Delete all the preferences settings
