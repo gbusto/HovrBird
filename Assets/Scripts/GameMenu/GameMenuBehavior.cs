@@ -22,6 +22,9 @@ public class GameMenuBehavior : MonoBehaviour
 
     public Button inventoryButton;
 
+    public GameObject hintMessageCanvas;
+    private HintMessageCanvasBehavior hintMessageCanvasScript;
+
     // Inventory popup
     public GameObject inventoryCanvasPrefab;
     private GameObject inventoryCanvas;
@@ -56,6 +59,9 @@ public class GameMenuBehavior : MonoBehaviour
         Vector3 iScale = inventoryNotification.transform.localScale;
         inventoryNotification.transform.localScale = new Vector3(iScale.x * 1.5f, iScale.y * 1.5f, iScale.z);
         inventoryNotification.gameObject.SetActive(false);
+
+        hintMessageCanvasScript = hintMessageCanvas.GetComponent<HintMessageCanvasBehavior>();
+        hintMessageCanvas.gameObject.SetActive(false);
 
         notificationMgr.Subscribe(NotificationManager.newEggNotificationId, inventoryNotification);
         notificationMgr.Subscribe(NotificationManager.canHatchNotificationId, inventoryNotification);
@@ -102,6 +108,22 @@ public class GameMenuBehavior : MonoBehaviour
         // Hide all the testing buttons if we're not in testing mode
         Destroy(testingButtons);
 #endif
+
+        InventoryData id = InventoryData.Instance();
+        LevelData ld = LevelData.Instance();
+        if (false == PlayerPrefsCommon.GetMoreToCome() && ld.levelData.level5Complete)
+        {
+            string message = "Congratulations on completing the first five levels in Adventure mode!\n\n";
+            message += "More adventures to come soon! Keep checking back for updates!";
+            hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissMoreToComePopup);
+            hintMessageCanvasScript.ShowMessage(message);
+        }
+    }
+
+    private void DismissMoreToComePopup()
+    {
+        PlayerPrefsCommon.SetMoreToCome(true);
+        hintMessageCanvasScript.dismissHintButton.onClick.RemoveListener(DismissMoreToComePopup);
     }
 
     public void OnApplicationQuit()

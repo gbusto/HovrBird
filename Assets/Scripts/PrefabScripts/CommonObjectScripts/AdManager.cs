@@ -93,6 +93,7 @@ public class AdManager
     public void RewardAdLoadFail(object sender, AdErrorEventArgs args)
     {
         rewardAdIsReady = false;
+        rewardAdBeingLoaded = false;
     }
 
 

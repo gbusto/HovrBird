@@ -165,12 +165,37 @@ public class CommonBehavior : MonoBehaviour
         rewardAd.OnUserEarnedReward += HandleUserEarnedReward;
         // Called when the ad is closed.
         rewardAd.OnAdClosed += HandleRewardAdClosed;
+
+        rewardAd.OnAdFailedToLoad += HandleRewardAdLoadFailed;
     }
 
     private void UnsubscribeRewardAdEvents()
     {
         rewardAd.OnUserEarnedReward -= HandleUserEarnedReward;
         rewardAd.OnAdClosed -= HandleRewardAdClosed;
+        rewardAd.OnAdFailedToLoad -= HandleRewardAdLoadFailed;
+    }
+
+    public void HandleRewardAdLoadFailed(object sender, AdErrorEventArgs args)
+    {
+        if (Application.internetReachability == NetworkReachability.NotReachable)
+        {
+            playCanvasScript.heartImage.sprite = playCanvasScript.noLifeSprite;
+            userWasRescued = true;
+
+            if (false == PlayerPrefsCommon.GetUserIsOffline())
+            {
+                string message = "It seems you're offline. You won't be able to rescue yourself after hitting an obstacle until you're back online.";
+                hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissUserIsOfflinePopup);
+                hintMessageCanvasScript.ShowMessage(message);
+            }
+        }
+    }
+
+    private void DismissUserIsOfflinePopup()
+    {
+        PlayerPrefsCommon.SetUserIsOffline(true);
+        hintMessageCanvasScript.dismissHintButton.onClick.RemoveListener(DismissUserIsOfflinePopup);
     }
 
     public void HandleRewardAdClosed(object sender, EventArgs args)
@@ -303,6 +328,16 @@ public class CommonBehavior : MonoBehaviour
         hintMessageCanvas.gameObject.SetActive(false);
 
         // Level 0 is classic mode
+        if (0 == currentLevelNumber)
+        {
+            if (false == PlayerPrefsCommon.GetHowtoPlayClassic())
+            {
+                hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissHowotoPlayClassicClicked);
+                string message = "Welcome to Classic mode!\n\nTap to fly and avoid obstacles for as long as you can. Always strive to beat your high score!";
+                hintMessageCanvasScript.ShowMessage(message);
+            }
+        }
+
         if (1 == currentLevelNumber)
         {
             if (false == PlayerPrefsCommon.GetHowtoPlayPopup())
@@ -329,13 +364,19 @@ public class CommonBehavior : MonoBehaviour
             if (false == PlayerPrefsCommon.GetRareFruitNew())
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissRareFruitPopupClicked);
-                string message = "Level 5 introduces a rare fruit: strawberries.\n\n";
-                message += "Collect as many items as you can and make sure you catch the egg!";
+                string message = "Level 5 contains 2 new items: strawberries and an egg!\n\n";
+                message += "Make sure you don't miss the egg!";
                 hintMessageCanvasScript.ShowMessage(message);
             }
         }
 
         notificationMgr = NotificationManager.Instance();
+    }
+
+    private void DismissHowotoPlayClassicClicked()
+    {
+        PlayerPrefsCommon.SetHowtoPlayClassic(true);
+        hintMessageCanvasScript.dismissHintButton.onClick.RemoveListener(DismissHowotoPlayClassicClicked);
     }
 
     private void DismissHowotoPlayPopupClicked()
