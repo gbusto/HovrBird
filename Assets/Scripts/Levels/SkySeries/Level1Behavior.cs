@@ -363,8 +363,11 @@ public class Level1Behavior : MonoBehaviour
                 // Keep objects moving after user wins
                 if (userWon)
                 {
+                    // Ensure all items continue moving after game is over
+                    // It looks better than everything just stopping
                     UpdateCloudObjects();
                     UpdateGameObjectsPositions(gameObstacles);
+                    UpdateGameObjectsPositions(gameCollectibles);
                     UpdateGroundObjects();
                 }
                 break;
