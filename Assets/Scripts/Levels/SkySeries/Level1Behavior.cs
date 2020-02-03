@@ -139,6 +139,8 @@ public class Level1Behavior : MonoBehaviour
     private bool addEggToSlot;
     private bool caughtEgg;
 
+    private bool strawberryWasGenerated;
+
     private LevelData levelData;
 
     List<(GameObject, float)> cloudPrefabs;
@@ -907,6 +909,17 @@ public class Level1Behavior : MonoBehaviour
             GameObject prefab = collectiblePrefabArray[sysRandom.Next(0, collectiblePrefabArray.Length)];
             if (null != prefab)
             {
+                if (prefab == strawberryPrefab && strawberryWasGenerated)
+                {
+                    return;
+                }
+
+                if (prefab == strawberryPrefab)
+                {
+                    // We only want to generate 1 strawberry per level
+                    strawberryWasGenerated = true;
+                }
+
                 // Generate this collectible item type
                 GameObject obj = Instantiate(prefab);
                 Renderer r = obj.GetComponent<Renderer>();
@@ -1393,15 +1406,16 @@ public class Level1Behavior : MonoBehaviour
         // 50 coins
         collectiblePrefabArray = new GameObject[100];
         collectiblePrefabArray[0] = strawberryPrefab;
-        for (int i = 1; i < 9; ++i)
+        collectiblePrefabArray[1] = strawberryPrefab;
+        for (int i = 2; i < 11; ++i)
         {
             collectiblePrefabArray[i] = blueberryPrefab;
         }
-        for (int i = 9; i < 25; ++i)
+        for (int i = 11; i < 27; ++i)
         {
             collectiblePrefabArray[i] = bananaPrefab;
         }
-        for (int i = 25; i < 75; ++i)
+        for (int i = 27; i < 75; ++i)
         {
             collectiblePrefabArray[i] = coinPrefab;
         }
