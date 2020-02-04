@@ -178,6 +178,15 @@ public class CommonBehavior : MonoBehaviour
 
     public void HandleRewardAdLoadFailed(object sender, AdErrorEventArgs args)
     {
+        /*
+        if (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork ||
+            Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork)
+        {
+            // Don't do anything if the network is still accessible
+            return;
+        }
+
+        // If the network is inaccessible, notify the user
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
             playCanvasScript.heartImage.sprite = playCanvasScript.noLifeSprite;
@@ -190,6 +199,7 @@ public class CommonBehavior : MonoBehaviour
                 hintMessageCanvasScript.ShowMessage(message);
             }
         }
+        */
     }
 
     private void DismissUserIsOfflinePopup()
