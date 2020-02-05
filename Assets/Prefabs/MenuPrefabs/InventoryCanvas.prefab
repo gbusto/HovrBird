@@ -2760,7 +2760,7 @@ MonoBehaviour:
   blueberriesCountText: {fileID: 8247426996679906464}
   strawberryCountText: {fileID: 8247426996854675739}
   kokoSprite: {fileID: 21300000, guid: 216ab2d0fb2be4880a81919999f2b5bb, type: 3}
-  samSprite: {fileID: 21300000, guid: 899700fb6e1274eae83d98cc5087f61c, type: 3}
+  samSprite: {fileID: 21300000, guid: d027081e750904c4e958bacd1495002a, type: 3}
   notificationCanvasPrefab: {fileID: 7118869547811108243, guid: f89053a661e984794ac2ad8e2681121e,
     type: 3}
 --- !u!328 &1931688170982614016

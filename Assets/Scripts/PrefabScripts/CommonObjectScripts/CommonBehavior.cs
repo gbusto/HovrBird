@@ -105,7 +105,7 @@ public class CommonBehavior : MonoBehaviour
     private readonly int interstitialThreshold = 3;
 
     // This needs to be set to false to enable real ads
-    private readonly bool TESTING = true;
+    private readonly bool TESTING = false;
 
     private NotificationManager notificationMgr;
 
@@ -178,6 +178,15 @@ public class CommonBehavior : MonoBehaviour
 
     public void HandleRewardAdLoadFailed(object sender, AdErrorEventArgs args)
     {
+        /*
+        if (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork ||
+            Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork)
+        {
+            // Don't do anything if the network is still accessible
+            return;
+        }
+
+        // If the network is inaccessible, notify the user
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
             playCanvasScript.heartImage.sprite = playCanvasScript.noLifeSprite;
@@ -190,6 +199,7 @@ public class CommonBehavior : MonoBehaviour
                 hintMessageCanvasScript.ShowMessage(message);
             }
         }
+        */
     }
 
     private void DismissUserIsOfflinePopup()
@@ -353,7 +363,7 @@ public class CommonBehavior : MonoBehaviour
             if (false == PlayerPrefsCommon.GetUncommonFruitNew())
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissUncommonFruitPopupClicked);
-                string message = "Level 3 introduces an uncommon fruit: blueberries.\n\n";
+                string message = "Level 3 introduces a new fruit: blueberries.\n\n";
                 message += "Continue to catch as many coins, bananas, and blueberries as you can!";
                 hintMessageCanvasScript.ShowMessage(message);
             }
@@ -562,7 +572,7 @@ public class CommonBehavior : MonoBehaviour
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissCollectedFirstEggPopupClicked);
                 string message = "You caught your first egg!\n\n";
-                message += "View the requirements for hatching the egg in your inventory Birds tab.";
+                message += "View the requirements for hatching the egg in your inventory by clicking the Birds tab.";
                 hintMessageCanvasScript.ShowMessage(message);
             }
         }
@@ -631,7 +641,6 @@ public class CommonBehavior : MonoBehaviour
         }
         else if (obj.tag == "Collectible")
         {
-            print("Common: Adding object to queue with name " + obj.name);
             IncrementScore();
             itemsCollected.Enqueue(obj);
         }
@@ -773,7 +782,7 @@ public class CommonBehavior : MonoBehaviour
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissLevel1CompletedPopupClicked);
                 string message = "Congratulations!\n\nYou unlocked level 2!\n\n";
-                message += "You also collected " + score + " items! Check your inventory by tapping the button on the bottom right.";
+                message += "You also collected " + score + " items! Check your inventory by tapping the backpack button on the bottom right.";
                 hintMessageCanvasScript.ShowMessage(message);
             }
 

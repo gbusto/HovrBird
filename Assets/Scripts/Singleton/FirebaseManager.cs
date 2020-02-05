@@ -77,8 +77,6 @@ public class FirebaseManager
             return;
         }
 
-        MonoBehaviour.print("Analytics: Logging tutorial begin event...");
-
         FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventTutorialBegin);
     }
 
@@ -89,8 +87,6 @@ public class FirebaseManager
             return;
         }
 
-        MonoBehaviour.print("Analytics: Logging tutorial complete event...");
-
         FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventTutorialComplete);
     }
 
@@ -100,8 +96,6 @@ public class FirebaseManager
         {
             return;
         }
-
-        MonoBehaviour.print("Analytics: Logging spend virtual currency event...");
 
         Parameter[] parameters =
         {
@@ -120,8 +114,6 @@ public class FirebaseManager
             return;
         }
 
-        MonoBehaviour.print("Analytics: Logging earn virtual currency event...");
-
         Parameter[] parameters =
         {
             new Parameter(FirebaseAnalytics.ParameterVirtualCurrencyName, currencyName),
@@ -137,8 +129,6 @@ public class FirebaseManager
         {
             return;
         }
-
-        MonoBehaviour.print("Analytics: Logging post score event...");
 
         string character;
         switch (birdId)
@@ -173,8 +163,6 @@ public class FirebaseManager
             return;
         }
 
-        MonoBehaviour.print("Analytics: Logging unlock achievement event...");
-
         FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventUnlockAchievement,
             FirebaseAnalytics.ParameterAchievementId, achievement);
     }
@@ -186,8 +174,6 @@ public class FirebaseManager
             return;
         }
 
-        MonoBehaviour.print("Analytics: Logging level start event...");
-
         FirebaseAnalytics.LogEvent(FirebaseAnalytics.EventLevelStart,
             FirebaseAnalytics.ParameterLevel, levelNumber);
     }
@@ -198,8 +184,6 @@ public class FirebaseManager
         {
             return;
         }
-
-        MonoBehaviour.print("Analytics: Logging level end event...");
 
         Parameter[] parameters =
         {
