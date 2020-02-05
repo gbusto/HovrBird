@@ -782,7 +782,7 @@ public class CommonBehavior : MonoBehaviour
             {
                 hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissLevel1CompletedPopupClicked);
                 string message = "Congratulations!\n\nYou unlocked level 2!\n\n";
-                message += "You also collected " + score + " items! Check your inventory by tapping the button on the bottom right.";
+                message += "You also collected " + score + " items! Check your inventory by tapping the backpack button on the bottom right.";
                 hintMessageCanvasScript.ShowMessage(message);
             }
 
