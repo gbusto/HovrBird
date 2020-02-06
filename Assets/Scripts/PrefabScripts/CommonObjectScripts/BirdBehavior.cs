@@ -93,16 +93,16 @@ public class BirdBehavior : MonoBehaviour
                     ChangeColor();
                 }
             }
+        }
 
-            if (changeSprite)
+        if (changeSprite)
+        {
+            changeSpriteTimer += Time.deltaTime;
+            if (changeSpriteTimer >= changeSpriteWaitFor)
             {
-                changeSpriteTimer += Time.deltaTime;
-                if (changeSpriteTimer >= changeSpriteWaitFor)
-                {
-                    changeSprite = false;
-                    thisSpriteRenderer.sprite = birdNormal;
-                    changeSpriteTimer = 0f;
-                }
+                changeSprite = false;
+                thisSpriteRenderer.sprite = birdNormal;
+                changeSpriteTimer = 0f;
             }
         }
     }
