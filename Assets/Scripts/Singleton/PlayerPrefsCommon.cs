@@ -16,6 +16,7 @@ public class PlayerPrefsCommon
     private const string howtoPlayClassicKey = "HowtoPlayClassic";
     private const string moreToComeKey = "MoreToCome";
     private const string userIsOfflineKey = "UserIsOffline";
+    private const string reviewPrompt1Key = "ReviewPrompt1";
 
     /*
      * Functions to handle the egg highlight setting;
@@ -295,6 +296,29 @@ public class PlayerPrefsCommon
         }
 
         return 1 == PlayerPrefs.GetInt(userIsOfflineKey);
+    }
+
+
+    public static void SetReviewPrompt1(bool b)
+    {
+        if (b)
+        {
+            PlayerPrefs.SetInt(reviewPrompt1Key, 1);
+        }
+        else
+        {
+            PlayerPrefs.SetInt(reviewPrompt1Key, 0);
+        }
+    }
+
+    public static bool GetReviewPrompt1()
+    {
+        if (false == PlayerPrefs.HasKey(reviewPrompt1Key))
+        {
+            SetReviewPrompt1(false);
+        }
+
+        return 1 == PlayerPrefs.GetInt(reviewPrompt1Key);
     }
 
     /*

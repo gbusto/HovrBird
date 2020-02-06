@@ -26,6 +26,9 @@ public class CommonBehavior : MonoBehaviour
     /*
      * Menu game objects
      */
+    public GameObject reviewCanvas;
+    private ReviewCanvasBehavior reviewScript;
+
     public GameObject footerMenuPrefab;
     private GameObject footerMenuCanvas;
     private FooterButtonsBehavior footerButtonsScript;
@@ -105,7 +108,7 @@ public class CommonBehavior : MonoBehaviour
     private readonly int interstitialThreshold = 3;
 
     // This needs to be set to false to enable real ads
-    private readonly bool TESTING = false;
+    private readonly bool TESTING = true;
 
     private NotificationManager notificationMgr;
 
@@ -380,7 +383,40 @@ public class CommonBehavior : MonoBehaviour
             }
         }
 
+        InventoryData inventoryData = InventoryData.Instance();
+        LevelData levelData = LevelData.Instance();
+        reviewCanvas.gameObject.SetActive(false);
+        if (false == PlayerPrefsCommon.GetReviewPrompt1())
+        {
+            if (levelData.levelData.level5Complete && inventoryData.HasEggHatched(InventoryData.SAM_ID))
+            {
+                reviewScript = reviewCanvas.GetComponent<ReviewCanvasBehavior>();
+                reviewScript.dismissButton.onClick.AddListener(DismissReviewCanvas);
+                reviewScript.reviewButton.onClick.AddListener(RedirectForReview);
+                reviewCanvas.gameObject.SetActive(true);
+            }
+        }
+
         notificationMgr = NotificationManager.Instance();
+    }
+
+    private void DismissReviewCanvas()
+    {
+        PlayerPrefsCommon.SetReviewPrompt1(true);
+        reviewCanvas.gameObject.SetActive(false);
+    }
+
+    private void RedirectForReview()
+    {
+#if UNITY_IOS
+        string url = "https://apps.apple.com/us/app/brick-break/id1491060128";
+#elif UNITY_ANDROID
+        string url = "https://play.google.com/store/apps/details?id=xyz.ashgames.hovrbird";
+#elif UNITY_EDITOR
+        string url = "https://apps.apple.com/us/app/brick-break/id1491060128";
+#endif
+
+        Application.OpenURL(url);
     }
 
     private void DismissHowotoPlayClassicClicked()
@@ -520,7 +556,7 @@ public class CommonBehavior : MonoBehaviour
      * to work a certain way. All other functions and code can be modified if
      * needed.
      */
-    #region ExposedToLevel
+#region ExposedToLevel
 
     // Variable: (bool) disableColliders
     // Variable: (Queue) itemsCollected
@@ -605,7 +641,7 @@ public class CommonBehavior : MonoBehaviour
     }
 
 
-    #endregion
+#endregion
 
 
 

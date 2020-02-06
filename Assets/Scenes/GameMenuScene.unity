@@ -840,6 +840,10 @@ MonoBehaviour:
   classicButton: {fileID: 401296945}
   adventureButton: {fileID: 27742598}
   testingButtons: {fileID: 1311369549}
+  deleteDataButton: {fileID: 1913771241}
+  resetPrefsButton: {fileID: 2066788426}
+  enableAllLevelsButton: {fileID: 48242256}
+  getAllCollectibles: {fileID: 1604677163}
   inventoryButton: {fileID: 800965901}
   hintMessageCanvas: {fileID: 1688311166}
   inventoryCanvasPrefab: {fileID: 8247426998153252334, guid: 1981fad7469dd4b16bc3e54a51b873f4,
@@ -1764,10 +1768,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 7779641484293152484, guid: e3348b88d494f44ce94e13b467700ad7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7779641484814798194, guid: e3348b88d494f44ce94e13b467700ad7,
         type: 3}
       propertyPath: m_Name
       value: HintMessageCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 7779641484814798194, guid: e3348b88d494f44ce94e13b467700ad7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7779641484814798199, guid: e3348b88d494f44ce94e13b467700ad7,
         type: 3}
