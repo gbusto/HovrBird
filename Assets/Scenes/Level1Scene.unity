@@ -1123,6 +1123,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   commonPrefab: {fileID: 6122329820804600070, guid: 8310485416b254ca7abd477379c98c0c,
     type: 3}
+  progressLinePrefab: {fileID: 7590961655731587626, guid: 76e5fb80d9f6e44ed9335e09554077ce,
+    type: 3}
   gameCamera: {fileID: 1573052313}
   background: {fileID: 340884334}
   finishLinePrefab: {fileID: 6414285918293242451, guid: 9e3996423cb824376b6ef494c9f12128,

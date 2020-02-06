@@ -49,6 +49,14 @@ public class Level1Behavior : MonoBehaviour
     private GameObject commonObject;
     private CommonBehavior commonScript;
 
+    public GameObject progressLinePrefab;
+    private const float progress25 = 0.25f;
+    private bool showedProgress25;
+    private const float progress50 = 0.50f;
+    private bool showedProgress50;
+    private const float progress75 = 0.75f;
+    private bool showedProgress75;
+
     public GameObject gameCamera;
     public GameObject background;
     public GameObject finishLinePrefab;
@@ -345,6 +353,34 @@ public class Level1Behavior : MonoBehaviour
                 else if (levelTimer >= timeForEggGeneration && generateEggItem && false == eggHasBeenGenerated)
                 {
                     addEggToSlot = true;
+                }
+
+                if ((levelTimer / levelTimeLength >= progress25) && false == showedProgress25)
+                {
+                    GameObject progressLine = Instantiate(progressLinePrefab);
+                    Vector3 pos = progressLine.transform.localPosition;
+                    pos.x = cameraMaxX;
+                    ProgressLineBehavior plScript = progressLine.GetComponent<ProgressLineBehavior>();
+                    plScript.InitProgressLine(commonScript, ProgressLineBehavior.LevelProgress.twentyFive, pos, speed);
+                    showedProgress25 = true;
+                }
+                else if ((levelTimer / levelTimeLength >= progress50) && false == showedProgress50)
+                {
+                    GameObject progressLine = Instantiate(progressLinePrefab);
+                    Vector3 pos = progressLine.transform.localPosition;
+                    pos.x = cameraMaxX;
+                    ProgressLineBehavior plScript = progressLine.GetComponent<ProgressLineBehavior>();
+                    plScript.InitProgressLine(commonScript, ProgressLineBehavior.LevelProgress.fifty, pos, speed);
+                    showedProgress50 = true;
+                }
+                else if ((levelTimer / levelTimeLength >= progress75) && false == showedProgress75)
+                {
+                    GameObject progressLine = Instantiate(progressLinePrefab);
+                    Vector3 pos = progressLine.transform.localPosition;
+                    pos.x = cameraMaxX;
+                    ProgressLineBehavior plScript = progressLine.GetComponent<ProgressLineBehavior>();
+                    plScript.InitProgressLine(commonScript, ProgressLineBehavior.LevelProgress.seventyFive, pos, speed);
+                    showedProgress75 = true;
                 }
 
                 break;
