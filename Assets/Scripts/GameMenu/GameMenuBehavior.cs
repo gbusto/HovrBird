@@ -22,6 +22,11 @@ public class GameMenuBehavior : MonoBehaviour
 
     public Button inventoryButton;
 
+    public Button contactButton;
+    public GameObject contactCanvas;
+    public Button contactCanvasEmailButton;
+    public Button contactCanvasDisimssButton;
+
     public GameObject hintMessageCanvas;
     private HintMessageCanvasBehavior hintMessageCanvasScript;
 
@@ -38,6 +43,8 @@ public class GameMenuBehavior : MonoBehaviour
     private LevelChanger levelChangerScript;
 
     private NotificationManager notificationMgr;
+
+    private const string CONTACT_EMAIL = "ash@ashgames.xyz";
 
 
     public void Awake()
@@ -62,6 +69,8 @@ public class GameMenuBehavior : MonoBehaviour
 
         hintMessageCanvasScript = hintMessageCanvas.GetComponent<HintMessageCanvasBehavior>();
         hintMessageCanvas.gameObject.SetActive(false);
+
+        contactCanvas.gameObject.SetActive(false);
 
         notificationMgr.Subscribe(NotificationManager.newEggNotificationId, inventoryNotification);
         notificationMgr.Subscribe(NotificationManager.canHatchNotificationId, inventoryNotification);
@@ -99,6 +108,10 @@ public class GameMenuBehavior : MonoBehaviour
         adventureButton.onClick.AddListener(AdventureButtonClicked);
         inventoryButton.onClick.AddListener(InventoryButtonClicked);
 
+        contactButton.onClick.AddListener(ShowContactPopup);
+        contactCanvasEmailButton.onClick.AddListener(EmailButtonClicked);
+        contactCanvasDisimssButton.onClick.AddListener(DismissContactPopup);
+
 #if TESTING
         deleteDataButton.onClick.AddListener(DeleteDataButtonClicked);
         resetPrefsButton.onClick.AddListener(ResetPrefsButtonClicked);
@@ -118,6 +131,21 @@ public class GameMenuBehavior : MonoBehaviour
             hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissMoreToComePopup);
             hintMessageCanvasScript.ShowMessage(message);
         }
+    }
+
+    private void EmailButtonClicked()
+    {
+        Application.OpenURL("mailto:" + CONTACT_EMAIL);
+    }
+
+    private void ShowContactPopup()
+    {
+        contactCanvas.gameObject.SetActive(true);
+    }
+
+    private void DismissContactPopup()
+    {
+        contactCanvas.gameObject.SetActive(false);
     }
 
     private void DismissMoreToComePopup()
