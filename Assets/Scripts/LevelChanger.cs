@@ -8,7 +8,8 @@ public class LevelChanger : MonoBehaviour
     {
         back = -1,
         same = 0,
-        forward = 1
+        forward = 1,
+        nextLevel,
     };
 
     private string sceneToLoad;
@@ -36,6 +37,13 @@ public class LevelChanger : MonoBehaviour
         animator.SetTrigger("FadeOut");
     }
 
+    public void FadeToNextLevel()
+    {
+        direction = Direction.nextLevel;
+
+        animator.SetTrigger("FadeOut");
+    }
+
     public void OnFadeComplete()
     {
         switch (direction)
@@ -50,6 +58,10 @@ public class LevelChanger : MonoBehaviour
 
             case Direction.forward:
                 Navigator.LoadScene(sceneToLoad);
+                break;
+
+            case Direction.nextLevel:
+                Navigator.LoadNextLevelScene();
                 break;
         }
     }

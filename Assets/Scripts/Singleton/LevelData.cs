@@ -40,6 +40,26 @@ public struct LevelDataStruct
     public bool level5Complete;
     public int level5HighScore;
     public int level5TimesPlayed;
+
+    public bool level6Complete;
+    public int level6HighScore;
+    public int level6TimesPlayed;
+
+    public bool level7Complete;
+    public int level7HighScore;
+    public int level7TimesPlayed;
+
+    public bool level8Complete;
+    public int level8HighScore;
+    public int level8TimesPlayed;
+
+    public bool level9Complete;
+    public int level9HighScore;
+    public int level9TimesPlayed;
+
+    public bool level10Complete;
+    public int level10HighScore;
+    public int level10TimesPlayed;
 }
 
 public class LevelData

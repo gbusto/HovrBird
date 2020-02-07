@@ -16,11 +16,16 @@ public static class TestingCommon
     public static void EnableAllLevels()
     {
         LevelData data = LevelData.Instance();
-        data.levelData.level1Complete = true;
-        data.levelData.level2Complete = true;
-        data.levelData.level3Complete = true;
-        data.levelData.level4Complete = true;
-        data.levelData.level5Complete = true;
+        data.levelData.level1Complete  = true;
+        data.levelData.level2Complete  = true;
+        data.levelData.level3Complete  = true;
+        data.levelData.level4Complete  = true;
+        data.levelData.level5Complete  = true;
+        data.levelData.level6Complete  = true;
+        data.levelData.level7Complete  = true;
+        data.levelData.level8Complete  = true;
+        data.levelData.level9Complete  = true;
+        data.levelData.level10Complete = true;
         data.SaveUserData();
     }
 

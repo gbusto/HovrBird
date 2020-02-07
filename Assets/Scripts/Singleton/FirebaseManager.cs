@@ -16,8 +16,12 @@ public class FirebaseManager
 
     public const string CHARACTER_NAME_KOKO = "koko";
     public const string CHARACTER_NAME_SAM = "sam";
+    public const string CHARACTER_NAME_NIGEL = "nigel";
+    public const string CHARACTER_NAME_STEVEN = "steven";
 
     public const string ACHIEVEMENT_ID_HATCH_SAM = "hatched_sam";
+    public const string ACHIEVEMENT_ID_HATCH_NIGEL = "hatched_nigel";
+    public const string ACHIEVEMENT_ID_HATCH_STEVEN = "hatched_steven";
     /* Examples of other achievements:
      * - Score milestones in classic (10, 50, 100, 200, 300, 400, 500, 1000, etc)
      * - Hatching other birds

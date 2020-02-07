@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Level1Scene.unity
     guid: 4a7ade0a61e4445df9217bc4334727b1
   - enabled: 1
+    path: Assets/Scenes/WaterSeriesScene.unity
+    guid: ef29a3cf3d2844b50ba7aa4f3229638a
+  - enabled: 1
     path: Assets/Scenes/LevelSelectionScene.unity
     guid: 19e5cd7bad95f4a6dac15da7480b29a1
   - enabled: 1

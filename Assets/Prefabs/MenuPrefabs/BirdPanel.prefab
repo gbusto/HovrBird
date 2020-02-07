@@ -1081,6 +1081,11 @@ MonoBehaviour:
   req3Text: {fileID: 9152534526218584348}
   req4Text: {fileID: 3614402615354909807}
   req5Text: {fileID: 9184671924950904119}
+  hatchVideoPlayer: {fileID: 6533974125600358232}
+  samHatchingVideoClip: {fileID: 32900000, guid: 178f43f70830340ff86f14a971c513d5,
+    type: 3}
+  nigelHatchingVideoClip: {fileID: 32900000, guid: f14b745d512044f40866d037bd8bad9a,
+    type: 3}
   notificationCanvasPrefab: {fileID: 7118869547811108243, guid: f89053a661e984794ac2ad8e2681121e,
     type: 3}
 --- !u!1 &6710525669922057188

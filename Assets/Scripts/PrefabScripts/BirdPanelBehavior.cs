@@ -29,6 +29,9 @@ public class BirdPanelBehavior : MonoBehaviour
     public Text req4Text;
     public Text req5Text;
 
+    public VideoClip samHatchingVideoClip;
+    public VideoClip nigelHatchingVideoClip;
+
     public GameObject notificationCanvasPrefab;
     private GameObject buttonNotification;
 
@@ -38,8 +41,6 @@ public class BirdPanelBehavior : MonoBehaviour
     private List<(Image, Text)> birdReqsList;
     private InventoryData inventoryData;
     private bool configured;
-
-    private Dictionary<string, int> reqsDict;
 
     private GameObject parentObject;
 
@@ -156,6 +157,21 @@ public class BirdPanelBehavior : MonoBehaviour
         birdNameText.text = name;
         this.parentObject = parentObject;
 
+        switch (birdId)
+        {
+            case InventoryData.SAM_ID:
+                videoPlayer.clip = samHatchingVideoClip;
+                break;
+
+            case InventoryData.NIGEL_ID:
+                videoPlayer.clip = nigelHatchingVideoClip;
+                break;
+
+            default:
+                videoPlayer.clip = null;
+                break;
+        }
+
         for (int i = 0; i < birdReqsList.Count; ++i)
         {
             if (i < reqsConfig.Count)
@@ -169,8 +185,6 @@ public class BirdPanelBehavior : MonoBehaviour
                 birdReqsList[i].Item2.gameObject.SetActive(false);
             }
         }
-
-        this.reqsDict = reqsDict;
 
         birdNameText.gameObject.SetActive(false);
         birdButton.interactable = false;
@@ -266,8 +280,13 @@ public class BirdPanelBehavior : MonoBehaviour
 
         if (videoPreparationComplete && videoPlayer.isPrepared)
         {
+            print("Video player is ready!");
             eggHatchingDisplay.gameObject.SetActive(true);
             videoPlayer.Play();
+        }
+        else
+        {
+            print("Video player isn't ready!");
         }
     }
 
@@ -281,18 +300,5 @@ public class BirdPanelBehavior : MonoBehaviour
         birdButton.interactable = false;
 
         parentObject.SendMessage("SwitchActiveBird", gameObject);
-    }
-
-    private bool RequirementsMet()
-    {
-        foreach (KeyValuePair<string, int> req in reqsDict)
-        {
-            if (inventoryData.collectibleDict[req.Key] < reqsDict[req.Key])
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

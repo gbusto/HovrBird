@@ -263,8 +263,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 5631597819116979035}
   m_HandleRect: {fileID: 13662772350649386}
   m_Direction: 0
-  m_Value: -0.00000010172524
-  m_Size: 0.49999994
+  m_Value: 0
+  m_Size: 0.24999997
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -858,7 +858,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: -149.99998, y: 0}
-  m_SizeDelta: {x: 600, y: 0}
+  m_SizeDelta: {x: 1200, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &5641868969209834503
 GameObject:
@@ -2761,6 +2761,8 @@ MonoBehaviour:
   strawberryCountText: {fileID: 8247426996854675739}
   kokoSprite: {fileID: 21300000, guid: 216ab2d0fb2be4880a81919999f2b5bb, type: 3}
   samSprite: {fileID: 21300000, guid: d027081e750904c4e958bacd1495002a, type: 3}
+  nigelSprite: {fileID: 21300000, guid: 2a5c4f1e220f942eeab409caf19765db, type: 3}
+  stevenSprite: {fileID: 0}
   notificationCanvasPrefab: {fileID: 7118869547811108243, guid: f89053a661e984794ac2ad8e2681121e,
     type: 3}
 --- !u!328 &1931688170982614016

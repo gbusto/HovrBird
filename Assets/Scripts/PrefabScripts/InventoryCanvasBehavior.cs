@@ -28,6 +28,8 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
     public Sprite kokoSprite;
     public Sprite samSprite;
+    public Sprite nigelSprite;
+    public Sprite stevenSprite;
 
     public GameObject notificationCanvasPrefab;
     private GameObject itemsNotification;
@@ -88,7 +90,7 @@ public class InventoryCanvasBehavior : MonoBehaviour
                 uint birdId = InventoryData.BIRDS[i];
                 Sprite sprite = GetSpriteForId(birdId);
                 string birdName = GetNameForId(birdId);
-                List<(Sprite, int)> reqsSpriteList = GetReqSriteListForId(birdId);
+                List<(Sprite, int)> reqsSpriteList = GetReqSpriteListForId(birdId);
                 Dictionary<string, int> reqDict = InventoryData.GetRequirementForId(birdId);
                 // Instantiate a new panel
                 GameObject birdPanel = Instantiate(birdPanelPrefab);
@@ -183,6 +185,12 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
             case InventoryData.SAM_ID:
                 return samSprite;
+
+            case InventoryData.NIGEL_ID:
+                return nigelSprite;
+
+            case InventoryData.STEVEN_ID:
+                return samSprite;
         }
 
         return null;
@@ -197,13 +205,30 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
             case InventoryData.SAM_ID:
                 return "Sam";
+
+            case InventoryData.NIGEL_ID:
+                return "Nigel";
+
+            case InventoryData.STEVEN_ID:
+                return "Steven";
         }
 
         return "";
     }
 
-    private List<(Sprite, int)> GetReqSriteListForId(uint id)
+    private List<(Sprite, int)> GetReqSpriteListForId(uint id)
     {
+        List<(Sprite, int)> spriteReqList = new List<(Sprite, int)>();
+        Dictionary<string, int> reqDict = InventoryData.GetRequirementForId(id);
+
+        foreach (KeyValuePair<string, int> pair in reqDict)
+        {
+            Sprite s = GetCollectibleSpriteForKey(pair.Key);
+            spriteReqList.Add((s, pair.Value));
+        }
+        return spriteReqList;
+
+        /* XXX REMOVE ME
         switch (id)
         {
             case InventoryData.SAM_ID:
@@ -214,8 +239,49 @@ public class InventoryCanvasBehavior : MonoBehaviour
                     (blueberrySprite, InventoryData.samRequirements[InventoryData.blueberryKey]),
                     (strawberrySprite, InventoryData.samRequirements[InventoryData.strawberryKey])
                 };
+
+            case InventoryData.NIGEL_ID:
+                return new List<(Sprite, int)>()
+                {
+                    (coinSprite, InventoryData.nigelRequirements[InventoryData.coinKey]),
+                    (bananaSprite, InventoryData.nigelRequirements[InventoryData.bananaKey]),
+                    (blueberrySprite, InventoryData.nigelRequirements[InventoryData.blueberryKey]),
+                    (strawberrySprite, InventoryData.nigelRequirements[InventoryData.strawberryKey])
+                };
+
+            case InventoryData.STEVEN_ID:
+                return new List<(Sprite, int)>()
+                {
+                    (coinSprite, InventoryData.stevenRequirements[InventoryData.coinKey]),
+                    (bananaSprite, InventoryData.stevenRequirements[InventoryData.bananaKey]),
+                    (blueberrySprite, InventoryData.stevenRequirements[InventoryData.blueberryKey]),
+                    (strawberrySprite, InventoryData.stevenRequirements[InventoryData.strawberryKey])
+                };
         }
 
         return new List<(Sprite, int)>();
+        */
+    }
+
+    private Sprite GetCollectibleSpriteForKey(string key)
+    {
+        if (key == InventoryData.coinKey)
+        {
+            return coinSprite;
+        }
+        if (key == InventoryData.bananaKey)
+        {
+            return bananaSprite;
+        }
+        if (key == InventoryData.blueberryKey)
+        {
+            return blueberrySprite;
+        }
+        if (key == InventoryData.strawberryKey)
+        {
+            return strawberrySprite;
+        }
+
+        return coinSprite;
     }
 }

@@ -3,26 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct GameObstacle
-{
-    public GameObject gameObject;
-    public Transform transform;
-    public Renderer renderer;
-    public PolygonCollider2D collider;
-    public float xDelta;
-    public float yDelta;
-    public bool used;
-}
 
-public struct ObstaclePrefab
-{
-    public GameObject prefab;
-    public float minSpeed;
-    public float maxSpeed;
-    public float minChance;
-    public float maxChance;
-    public Direction[] directions;
-}
 
 public struct CollectiblePrefab
 {
@@ -36,12 +17,6 @@ public struct Slot
     public float chance;
 }
 
-public enum Direction
-{
-    none = 0,
-    up,
-    down
-};
 
 public class Level1Behavior : MonoBehaviour
 {
@@ -86,6 +61,8 @@ public class Level1Behavior : MonoBehaviour
     public GameObject bananaPrefab;
     public GameObject coinPrefab;
 
+    // Cloud prefabs; just objects to give the illusion that the level is moving
+    // to the left
     public GameObject cloud1Prefab;
     public GameObject cloud2Prefab;
     public GameObject cloud3Prefab;
@@ -276,7 +253,7 @@ public class Level1Behavior : MonoBehaviour
         groundMaxY = groundObject1.transform.position.y + ground1Renderer.bounds.size.y;
 
         // Seed the random number generator here first
-        Random.InitState(1);
+        Random.InitState(LevelManager.GetCurrentLevel());
 
         // These are percentages for generating obstacles in a given slot
         float[] percentages =
@@ -679,7 +656,7 @@ public class Level1Behavior : MonoBehaviour
                         commonScript.UpdateHighScore(levelData.levelData.level5HighScore);
                     }
 
-                    // Can't have a "next" level unlocked because there are only 5 levels
+                    nextLevelUnlocked = true;
 
                     break;
             }

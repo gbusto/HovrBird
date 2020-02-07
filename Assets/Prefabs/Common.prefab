@@ -146,6 +146,8 @@ MonoBehaviour:
     type: 3}
   samPrefab: {fileID: 626632475567629868, guid: 153369d1c75e247ad835849d0d8d28f1,
     type: 3}
+  nigelPrefab: {fileID: 3752392662938617608, guid: e76ec04c8572b4b83a531b00ae0406a2,
+    type: 3}
   disableColliders: 0
   levelChanger: {fileID: 6914358278458078921}
 --- !u!1001 &1913715367471272713

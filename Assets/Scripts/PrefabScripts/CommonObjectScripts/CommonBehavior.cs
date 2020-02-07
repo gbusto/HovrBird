@@ -83,6 +83,7 @@ public class CommonBehavior : MonoBehaviour
     // We get this from InventoryData now
     public GameObject kokoPrefab;
     public GameObject samPrefab;
+    public GameObject nigelPrefab;
 
     private GameObject birdObject;
     private BirdBehavior birdScript;
@@ -743,7 +744,8 @@ public class CommonBehavior : MonoBehaviour
             FadeToSameScene();
         }
         */
-        FadeToSameScene();
+
+        FadeToNextLevel();
     }
 
     // Switches state from Wait to Active
@@ -947,7 +949,12 @@ public class CommonBehavior : MonoBehaviour
             FadeToSameScene();
         }
 #endif
-*/
+        */
+    }
+
+    public void FadeToNextLevel()
+    {
+        levelChangerScript.FadeToNextLevel();
     }
 
     public void FadeToSameScene()
@@ -981,6 +988,9 @@ public class CommonBehavior : MonoBehaviour
             case InventoryData.SAM_ID:
                 // Validate with InventoryData to ensure the user actually has access to this
                 return samPrefab;
+
+            case InventoryData.NIGEL_ID:
+                return nigelPrefab;
 
             default:
                 PlayerPrefsCommon.SetActiveBirdId(InventoryData.KOKO_ID);

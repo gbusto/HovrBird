@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4784244532007848865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4784244532007848867}
+  - component: {fileID: 5949913249723724224}
+  m_Layer: 0
+  m_Name: GameItemsObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4784244532007848867
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4784244532007848865}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5949913249723724224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4784244532007848865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9d94510af9ca44788adb63f1b65de9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyBird1Prefab: {fileID: 7083300218506906694, guid: e6fdd2aad2b784f1bb6fa76f0914621c,
+    type: 3}
+  blimp1Prefab: {fileID: 3626431465691020300, guid: be9190b8d502048a1995e765a0a244ca,
+    type: 3}
+  blimp2Prefab: {fileID: 4436920792305393264, guid: 0f000bf314b834b91b1f0ddb501dfb50,
+    type: 3}
+  plane1Prefab: {fileID: 5371608257178834247, guid: 666c9d4e2fe224a5ab0a85aa2e345edb,
+    type: 3}
+  plane2Prefab: {fileID: 6366336392827894451, guid: d9996d05930334e2ba076b70f602f51e,
+    type: 3}
+  parachute1Prefab: {fileID: 44991188495070089, guid: 1617909e54dd7478382570ada56300ad,
+    type: 3}
+  parachute2Prefab: {fileID: 6937002489214690703, guid: 0b38b006672b7474d81acb6d7fa4b802,
+    type: 3}
+  parachute3Prefab: {fileID: 4991291572750179453, guid: bf48ba8fc05854fd6ab7f03db91f448f,
+    type: 3}
+  balloon1Prefab: {fileID: 9037779039931565591, guid: 64be71ecab3634a3ab2e7fa16844a24c,
+    type: 3}
+  balloon2Prefab: {fileID: 2075885502725730920, guid: 93bd4285a8f244a568bc1c785edaf0e8,
+    type: 3}
+  balloon3Prefab: {fileID: 2771495426096434193, guid: 5b9fbb8af193d4844b821fce3561681f,
+    type: 3}
+  wavePrefab: {fileID: 6872346114157934199, guid: 43571cd09a86f4216a1720ca1c74648b,
+    type: 3}
+  fish1Prefab: {fileID: 9008860926370273219, guid: 33c2b2575f7054fdaaf684be106294d5,
+    type: 3}
+  fish2Prefab: {fileID: 5613507286520246920, guid: dc3ae3ae0d2314420b1096f1930ed443,
+    type: 3}
+  fish3Prefab: {fileID: 1752774624451291977, guid: ea4d8265238924da9a86e190af15b72a,
+    type: 3}
+  boat1Prefab: {fileID: 4737717139797727871, guid: 5f596cc5f76424aefaf618ef40519475,
+    type: 3}
+  boat2Prefab: {fileID: 7164699375132172394, guid: 91bb5cf3460da4873ad6f1d0a704ae9b,
+    type: 3}
+  finishLinePrefab: {fileID: 6414285918293242451, guid: 9e3996423cb824376b6ef494c9f12128,
+    type: 3}
+  coinPrefab: {fileID: 747649907371809633, guid: ac5f88e50b6274740adc8c403d66707f,
+    type: 3}
+  bananaPrefab: {fileID: 7337920014592908462, guid: 84acf4b0f83af4cc0baeb37f90940369,
+    type: 3}
+  blueberriesPrefab: {fileID: 3005876804592575031, guid: 679cc6f1a53fa4e9b971f8bfcd8b90d9,
+    type: 3}
+  strawberryPrefab: {fileID: 7339276150818028654, guid: 3152adab802074431a078dc21fd2a040,
+    type: 3}

@@ -32,7 +32,9 @@ public class InventoryData
     public static readonly string strawberryKey = "strawberries";
 
     public const uint KOKO_ID = 0x1;
-    public const uint SAM_ID = 0x8c771755;
+    public const uint SAM_ID = 0x8c771755; // Toucan Sam
+    public const uint NIGEL_ID = 0x1eab5960; // Nigel the Pelican
+    public const uint STEVEN_ID = 0xbd894384; // Steven Seagel (seagull lol)
 
     public static Dictionary<string, int> samRequirements = new Dictionary<string, int>
     {
@@ -42,10 +44,28 @@ public class InventoryData
         [strawberryKey] = 1
     };
 
+    public static Dictionary<string, int> nigelRequirements = new Dictionary<string, int>
+    {
+        [coinKey] = 160,
+        [bananaKey] = 60,
+        [blueberryKey] = 24,
+        [strawberryKey] = 2
+    };
+
+    public static Dictionary<string, int> stevenRequirements = new Dictionary<string, int>
+    {
+        [coinKey] = 170,
+        [bananaKey] = 70,
+        [blueberryKey] = 26,
+        [strawberryKey] = 2
+    };
+
     public static uint[] BIRDS =
     {
         KOKO_ID,
-        SAM_ID
+        SAM_ID,
+        NIGEL_ID,
+        STEVEN_ID,
     };
 
     public const bool UNHATCHED = false;
@@ -124,6 +144,12 @@ public class InventoryData
         {
             case InventoryData.SAM_ID:
                 return InventoryData.samRequirements;
+
+            case InventoryData.NIGEL_ID:
+                return InventoryData.nigelRequirements;
+
+            case InventoryData.STEVEN_ID:
+                return InventoryData.stevenRequirements;
         }
 
         return new Dictionary<string, int>();
@@ -275,7 +301,22 @@ public class InventoryData
                         FirebaseManager.LogUnlockAchievementEvent(FirebaseManager.ACHIEVEMENT_ID_HATCH_SAM);
                         break;
 
-                    // Add new birds here
+                    case NIGEL_ID:
+                        notificationMgr.NotificationChange(NotificationManager.canHatchNotificationId,
+                                   NotificationManager.CLEAR_NOTIFICATION);
+
+                        FirebaseManager.LogUnlockAchievementEvent(FirebaseManager.ACHIEVEMENT_ID_HATCH_NIGEL);
+                        break;
+
+
+                    case STEVEN_ID:
+                        notificationMgr.NotificationChange(NotificationManager.canHatchNotificationId,
+                                   NotificationManager.CLEAR_NOTIFICATION);
+
+                        FirebaseManager.LogUnlockAchievementEvent(FirebaseManager.ACHIEVEMENT_ID_HATCH_STEVEN);
+                        break;
+
+                        // Add new birds here
                 }
 
                 // Save the data after this milestone
