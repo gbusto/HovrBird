@@ -247,16 +247,19 @@ public class LevelBehavior : MonoBehaviour
     // STEP 6: Gameover
     public void GameOver()
     {
+        bool newHighScore = false;
+
         // Update the classic game object; if this returns true, user beat their
         // high score!
         int score = commonScript.GetScore();
         if (score > levelData.levelData.level0HighScore)
         {
+            newHighScore = true;
             levelData.levelData.level0HighScore = score;
         }
         levelData.levelData.level0TimesPlayed += 1;
 
-        commonScript.UpdateHighScore(levelData.levelData.level0HighScore);
+        commonScript.UpdateHighScore(levelData.levelData.level0HighScore, newHighScore);
         commonScript.CleanupDone();
     }
 

@@ -134,7 +134,11 @@ MonoBehaviour:
     type: 3}
   gameOverCanvasPrefab: {fileID: 4070187896391569239, guid: 75ba2d737cbef4572bd30cfb2f8dea60,
     type: 3}
+  gameOverNewHighScoreCanvasPrefab: {fileID: 3750802876861088672, guid: d349cc4fc8eb046308b08a7eeb06440a,
+    type: 3}
   gameOverNextCanvasPrefab: {fileID: 3282486164358668815, guid: 0958fa0490d1743e486de9f58b11b0ee,
+    type: 3}
+  gameOverNewHighScoreNextCanvasPrefab: {fileID: 4787912868870414824, guid: 3517fabf0cfdd4c5592ff46d0717f4b2,
     type: 3}
   messageCanvas: {fileID: 6353344754710063742}
   hintMessageCanvas: {fileID: 8416028519350466594}

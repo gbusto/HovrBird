@@ -1007,7 +1007,6 @@ MonoBehaviour:
   inventoryButton: {fileID: 800965901}
   contactButton: {fileID: 1730478731}
   contactCanvas: {fileID: 985040750}
-  contactCanvasText: {fileID: 0}
   contactCanvasEmailButton: {fileID: 1066430264}
   contactCanvasDisimssButton: {fileID: 1634559857}
   hintMessageCanvas: {fileID: 1688311166}

@@ -61,9 +61,17 @@ public class CommonBehavior : MonoBehaviour
     private GameObject gameOverCanvas;
     private GameOverCanvasBehavior gameOverCanvasScript;
 
+    public GameObject gameOverNewHighScoreCanvasPrefab;
+    private GameObject gameOverNewHighScoreCanvas;
+    private NewHighScoreCanvasBehavior gameOverNewHighScoreScript;
+
     public GameObject gameOverNextCanvasPrefab;
     private GameObject gameOverNextCanvas;
     private GameOverNextCanvasBehavior gameOverNextCanvasScript;
+
+    public GameObject gameOverNewHighScoreNextCanvasPrefab;
+    private GameObject gameOverNewHighScoreNextCanvas;
+    private NewHighScoreCanvasNextBehavior gameOverNewHighScoreNextScript;
 
     public GameObject messageCanvas;
     private MessageCanvasBehavior messageCanvasScript;
@@ -95,6 +103,8 @@ public class CommonBehavior : MonoBehaviour
     private LevelChanger levelChangerScript;
 
     private uint activeBirdId;
+
+    private bool newHighScore;
 
 
     #region GoogleAds
@@ -325,14 +335,22 @@ public class CommonBehavior : MonoBehaviour
         gameOverCanvasScript.retryButton.onClick.AddListener(RestartGame);
         gameOverCanvas.gameObject.SetActive(false);
 
-        // XXX Need to add logic to select this menu when the user unlocks a new
-        // level. Need to change the way we determine what level the user is playing
-        // so it can't be modified on disk. It should all be in memory.
+        gameOverNewHighScoreCanvas = Instantiate(gameOverNewHighScoreCanvasPrefab);
+        gameOverNewHighScoreScript = gameOverNewHighScoreCanvas.GetComponent<NewHighScoreCanvasBehavior>();
+        gameOverNewHighScoreScript.retryButton.onClick.AddListener(RestartGame);
+        gameOverNewHighScoreCanvas.gameObject.SetActive(false);
+
         gameOverNextCanvas = Instantiate(gameOverNextCanvasPrefab);
         gameOverNextCanvasScript = gameOverNextCanvas.GetComponent<GameOverNextCanvasBehavior>();
         gameOverNextCanvasScript.retryButton.onClick.AddListener(RestartGame);
         gameOverNextCanvasScript.nextLevelButton.onClick.AddListener(NextLevelButtonClicked);
         gameOverNextCanvas.gameObject.SetActive(false);
+
+        gameOverNewHighScoreNextCanvas = Instantiate(gameOverNewHighScoreNextCanvasPrefab);
+        gameOverNewHighScoreNextScript = gameOverNewHighScoreNextCanvas.GetComponent<NewHighScoreCanvasNextBehavior>();
+        gameOverNewHighScoreNextScript.retryButton.onClick.AddListener(RestartGame);
+        gameOverNewHighScoreNextScript.nextLevelButton.onClick.AddListener(NextLevelButtonClicked);
+        gameOverNewHighScoreNextCanvas.gameObject.SetActive(false);
 
         messageCanvasScript = messageCanvas.GetComponent<MessageCanvasBehavior>();
         messageCanvas.gameObject.SetActive(false);
@@ -594,11 +612,25 @@ public class CommonBehavior : MonoBehaviour
 
         if (nextLevelUnlocked)
         {
-            ShowGameOverNextCanvas();
+            if (newHighScore)
+            {
+                ShowGameOverNewHighScoreNextCanvas();
+            }
+            else
+            {
+                ShowGameOverNextCanvas();
+            }
         }
         else
         {
-            ShowGameOverCanvas();
+            if (newHighScore)
+            {
+                ShowGameOverNewHighScoreCanvas();
+            }
+            else
+            {
+                ShowGameOverCanvas();
+            }
         }
 
         if (false == PlayerPrefsCommon.GetCollectedFirstEgg() && 5 == currentLevelNumber)
@@ -620,9 +652,14 @@ public class CommonBehavior : MonoBehaviour
         hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissCollectedFirstEggPopupClicked);
     }
 
-    public void UpdateHighScore(int score)
+    public void UpdateHighScore(int score, bool newHighScore = false)
     {
         highScore = score;
+
+        if (newHighScore)
+        {
+            this.newHighScore = newHighScore;
+        }
     }
 
     public int GetScore()
@@ -915,6 +952,20 @@ public class CommonBehavior : MonoBehaviour
         }
     }
 
+    private void ShowGameOverNewHighScoreCanvas()
+    {
+        gameOverNewHighScoreScript.SetHighScoreNumber(highScore);
+
+        if (rescueCanvas.activeInHierarchy)
+        {
+            rescueCanvas.gameObject.SetActive(false);
+        }
+
+        gameOverNewHighScoreCanvas.gameObject.SetActive(true);
+
+        ShowFooterButtons();
+    }
+
     private void ShowGameOverCanvas()
     {
         // Set the scores in the game over script to update the labels/texts
@@ -927,6 +978,20 @@ public class CommonBehavior : MonoBehaviour
         }
 
         gameOverCanvas.gameObject.SetActive(true);
+
+        ShowFooterButtons();
+    }
+
+    private void ShowGameOverNewHighScoreNextCanvas()
+    {
+        gameOverNewHighScoreNextScript.SetHighScoreNumber(highScore);
+
+        if (rescueCanvas.activeInHierarchy)
+        {
+            rescueCanvas.gameObject.SetActive(false);
+        }
+
+        gameOverNewHighScoreNextCanvas.gameObject.SetActive(true);
 
         ShowFooterButtons();
     }

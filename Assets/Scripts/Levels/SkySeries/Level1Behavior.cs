@@ -600,7 +600,7 @@ public class Level1Behavior : MonoBehaviour
                     {
                         // User beat their high score for level!
                         levelData.levelData.level1HighScore = score;
-                        commonScript.UpdateHighScore(score);
+                        commonScript.UpdateHighScore(score, true);
                     }
                     else
                     {
@@ -618,7 +618,7 @@ public class Level1Behavior : MonoBehaviour
                     {
                         // User beat their high score for level!
                         levelData.levelData.level2HighScore = score;
-                        commonScript.UpdateHighScore(score);
+                        commonScript.UpdateHighScore(score, true);
                     }
                     else
                     {
@@ -636,7 +636,7 @@ public class Level1Behavior : MonoBehaviour
                     {
                         // User beat their high score for level!
                         levelData.levelData.level3HighScore = score;
-                        commonScript.UpdateHighScore(score);
+                        commonScript.UpdateHighScore(score, true);
                     }
                     else
                     {
@@ -654,7 +654,7 @@ public class Level1Behavior : MonoBehaviour
                     {
                         // User beat their high score for level!
                         levelData.levelData.level4HighScore = score;
-                        commonScript.UpdateHighScore(score);
+                        commonScript.UpdateHighScore(score, true);
                     }
                     else
                     {
@@ -672,7 +672,7 @@ public class Level1Behavior : MonoBehaviour
                     {
                         // User beat their high score for level!
                         levelData.levelData.level5HighScore = score;
-                        commonScript.UpdateHighScore(score);
+                        commonScript.UpdateHighScore(score, true);
                     }
                     else
                     {
