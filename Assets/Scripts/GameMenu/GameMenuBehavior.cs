@@ -164,7 +164,8 @@ public class GameMenuBehavior : MonoBehaviour
         // Set the level number to 0 in level manager
         LevelManager.SetLevelNumber(0);
 
-        levelChangerScript.FadeToScene("ClassicGameScene");
+        // XXX UNCOMMENT ME levelChangerScript.FadeToScene("ClassicGameScene");
+        levelChangerScript.FadeToScene("NewGameMode");
     }
 
     public void AdventureButtonClicked()
