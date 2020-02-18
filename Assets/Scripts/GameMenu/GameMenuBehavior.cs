@@ -44,7 +44,7 @@ public class GameMenuBehavior : MonoBehaviour
 
     private NotificationManager notificationMgr;
 
-    private const string CONTACT_EMAIL = "ash@ashgames.xyz";
+    private const string CONTACT_EMAIL = "admin@ashgames.xyz";
 
 
     public void Awake()
