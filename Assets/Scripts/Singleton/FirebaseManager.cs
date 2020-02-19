@@ -7,6 +7,7 @@ public class FirebaseManager
     public static bool shouldLogEvents;
 
     public const string CURRENCY_SPEND_HATCH_EGG = "hatch_egg";
+    public const string CURRENCY_SPEND_RESCUE_USER = "rescue_user";
 
     public const string CURRENCY_NAME_COINS = "coins";
     public const string CURRENCY_NAME_BANANAS = "bananas";

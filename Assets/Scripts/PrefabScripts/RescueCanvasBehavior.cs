@@ -5,8 +5,9 @@ public class RescueCanvasBehavior : MonoBehaviour
 {
     public Image rescueBackgroundImage;
     public Text messageText;
-    public Button watchAdButton;
-    public Button dismissAdButton;
+    public Text coinCostText;
+    public Button yesButton;
+    public Button dismissButton;
 
     public Image rescueWarningImage;
 

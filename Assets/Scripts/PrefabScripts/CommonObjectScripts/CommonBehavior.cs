@@ -106,6 +106,8 @@ public class CommonBehavior : MonoBehaviour
 
     private bool newHighScore;
 
+    private const int RESCUE_COIN_COUNT = 10;
+
 
     #region GoogleAds
     /*
@@ -132,7 +134,7 @@ public class CommonBehavior : MonoBehaviour
 
         // Load the banner ad
         bannerView = AdManager.instance.GetBannerView();
-        bannerView.Hide();
+        // Ads: Hide banner view here
 
         // Load the interstitial ad
         InitializeInterstitialAd();
@@ -326,8 +328,10 @@ public class CommonBehavior : MonoBehaviour
 
         rescueCanvas = Instantiate(rescueCanvasPrefab);
         rescueCanvasScript = rescueCanvas.GetComponent<RescueCanvasBehavior>();
-        rescueCanvasScript.watchAdButton.onClick.AddListener(ShowRewardAd);
-        rescueCanvasScript.dismissAdButton.onClick.AddListener(RescueDontContinueGame);
+        // Ads: Change line below to make the onClick function ShowRewardAd instead of RescueUser
+        rescueCanvasScript.yesButton.onClick.AddListener(RescueUser);
+        rescueCanvasScript.dismissButton.onClick.AddListener(RescueDontContinueGame);
+        rescueCanvasScript.coinCostText.text = "x" + RESCUE_COIN_COUNT.ToString();
         rescueCanvas.gameObject.SetActive(false);
 
         gameOverCanvas = Instantiate(gameOverCanvasPrefab);
@@ -512,7 +516,7 @@ public class CommonBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InitializeAdTypes();
+        // Ads: Initialize ads here if needed
 
         if (null != cameraScript)
         {
@@ -729,6 +733,7 @@ public class CommonBehavior : MonoBehaviour
     {
         LevelManager.SetLevelNumber(currentLevelNumber + 1);
 
+        /*
         if (interstitialAd.IsLoaded() && (totalAttempts % interstitialThreshold == 0))
         {
             interstitialAd.Show();
@@ -737,6 +742,8 @@ public class CommonBehavior : MonoBehaviour
         {
             FadeToSameScene();
         }
+        */
+        FadeToSameScene();
     }
 
     // Switches state from Wait to Active
@@ -767,7 +774,7 @@ public class CommonBehavior : MonoBehaviour
         DismissStartMenu();
         DismissPauseMenu();
 
-        bannerView.Show();
+        // Ads: Show banner ad here
 
         FirebaseManager.LogLevelStartEvent(currentLevelNumber);
     }
@@ -784,11 +791,13 @@ public class CommonBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
+        /* Ads: Uncomment these if ads are re-enabled
         UnsubscribeInterstitialAdEvents();
         UnsubscribeRewardAdEvents();
 
         bannerView.Destroy();
         interstitialAd.Destroy();
+        */
     }
 
     public string GetLastCollisionTag()
@@ -799,6 +808,28 @@ public class CommonBehavior : MonoBehaviour
     public string GetLastTriggerCollisionTag()
     {
         return birdScript.triggerCollisionTag;
+    }
+
+    public bool CanShowRescueCanvas()
+    {
+        InventoryData iData = InventoryData.Instance();
+        return iData.collectibleDict[InventoryData.coinKey] >= RESCUE_COIN_COUNT;
+    }
+
+    public void RescueUser()
+    {
+        InventoryData inventoryData = InventoryData.Instance();
+        int coinCount = inventoryData.collectibleDict[InventoryData.coinKey];
+        if (coinCount >= RESCUE_COIN_COUNT)
+        {
+            Dictionary<string, int> dict = new Dictionary<string, int>
+            {
+                [InventoryData.coinKey] = RESCUE_COIN_COUNT
+            };
+            inventoryData.SpendCurrency(dict, FirebaseManager.CURRENCY_SPEND_RESCUE_USER);
+        }
+
+        RescueContinueGame();
     }
 
     public void ShowRewardAd()
@@ -869,7 +900,8 @@ public class CommonBehavior : MonoBehaviour
         }
         else
         {
-            if (false == userWasRescued && rewardAd.IsLoaded())
+            // Ads: Check if reward ad is loaded before showing rescue canvas
+            if (false == userWasRescued && CanShowRescueCanvas())
             {
                 StopGame();
 
@@ -899,6 +931,9 @@ public class CommonBehavior : MonoBehaviour
 
     public void RestartGame()
     {
+        FadeToSameScene();
+
+        /*
 #if UNITY_EDITOR
         FadeToSameScene();
 #else
@@ -912,6 +947,7 @@ public class CommonBehavior : MonoBehaviour
             FadeToSameScene();
         }
 #endif
+*/
     }
 
     public void FadeToSameScene()
@@ -1025,6 +1061,8 @@ public class CommonBehavior : MonoBehaviour
             rescueCanvas.gameObject.SetActive(true);
             playCanvasScript.pauseButton.gameObject.SetActive(false);
         }
+
+        ShowFooterButtons();
     }
 
     private void ShowPauseMenu()
@@ -1039,7 +1077,7 @@ public class CommonBehavior : MonoBehaviour
     {
         footerMenuCanvas.gameObject.SetActive(true);
 
-        bannerView.Hide();
+        // Ads: Hide banner ad here
     }
 
     private void DismissStartMenu()
