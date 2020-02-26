@@ -60,6 +60,26 @@ public struct LevelDataStruct
     public bool level10Complete;
     public int level10HighScore;
     public int level10TimesPlayed;
+
+    public bool level11Complete;
+    public int level11HighScore;
+    public int level11TimesPlayed;
+
+    public bool level12Complete;
+    public int level12HighScore;
+    public int level12TimesPlayed;
+
+    public bool level13Complete;
+    public int level13HighScore;
+    public int level13TimesPlayed;
+
+    public bool level14Complete;
+    public int level14HighScore;
+    public int level14TimesPlayed;
+
+    public bool level15Complete;
+    public int level15HighScore;
+    public int level15TimesPlayed;
 }
 
 public class LevelData
@@ -111,6 +131,46 @@ public class LevelData
             level5Complete = false,
             level5HighScore = 0,
             level5TimesPlayed = 0,
+
+            level6Complete = false,
+            level6HighScore = 0,
+            level6TimesPlayed = 0,
+
+            level7Complete = false,
+            level7HighScore = 0,
+            level7TimesPlayed = 0,
+
+            level8Complete = false,
+            level8HighScore = 0,
+            level8TimesPlayed = 0,
+
+            level9Complete = false,
+            level9HighScore = 0,
+            level9TimesPlayed = 0,
+
+            level10Complete = false,
+            level10HighScore = 0,
+            level10TimesPlayed = 0,
+
+            level11Complete = false,
+            level11HighScore = 0,
+            level11TimesPlayed = 0,
+
+            level12Complete = false,
+            level12HighScore = 0,
+            level12TimesPlayed = 0,
+
+            level13Complete = false,
+            level13HighScore = 0,
+            level13TimesPlayed = 0,
+
+            level14Complete = false,
+            level14HighScore = 0,
+            level14TimesPlayed = 0,
+
+            level15Complete = false,
+            level15HighScore = 0,
+            level15TimesPlayed = 0,
         };
     }
 

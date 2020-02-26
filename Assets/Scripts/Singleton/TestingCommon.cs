@@ -26,6 +26,11 @@ public static class TestingCommon
         data.levelData.level8Complete  = true;
         data.levelData.level9Complete  = true;
         data.levelData.level10Complete = true;
+        data.levelData.level11Complete = true;
+        data.levelData.level12Complete = true;
+        data.levelData.level13Complete = true;
+        data.levelData.level14Complete = true;
+        data.levelData.level15Complete = true;
         data.SaveUserData();
     }
 

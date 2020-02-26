@@ -2,6 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
+public struct ObstacleCounter
+{
+    public int id;
+    public int countInScene;
+    public int countInLevel;
+
+    public ObstacleCounter(int id, int sceneCount, int levelCount)
+    {
+        this.id = id;
+        countInScene = sceneCount;
+        countInLevel = levelCount;
+    }
+
+    public void IncrementSceneCount()
+    {
+        countInScene += 1;
+    }
+
+    public void DecrementSceneCount()
+    {
+        countInScene -= 1;
+    }
+
+    public void IncrementLevelCount()
+    {
+        countInLevel += 1;
+    }
+}
+
 public struct GameObstacle
 {
     public GameObject gameObject;
@@ -9,25 +40,33 @@ public struct GameObstacle
     public Renderer renderer;
     public PolygonCollider2D collider;
     public Direction direction;
-    public float xDelta;
-    public float yDelta;
-    public float startY;
-    public float endY;
+    public float xDelta; // Left moving speed of an object each frame
+    public float yDelta; // Vertical change of an object each frame
+    public float startY; // The Y value at which an object starts (bottom of the "wave")
+    public float endY;   // The Y value at which an object should begin descending (top of the "wave")
+    public bool incrementY; // Boolean that says whether Y value should be incrementing or decrementing
     public bool used;
-    public bool incrementY;
     public int _id;
 }
 
 public struct ObstaclePrefab
 {
     public GameObject prefab;
+    public float startX;
+    public float endX;
     public float minSpeed;
     public float maxSpeed;
     public float minChance;
     public float maxChance;
+    public float maxGenY; // Largest starting value for Y for an object
+    public float minGenY; // Lowest starting value for Y for an object
+    public float maxMoveY; // Largest value of Y when object is in motion before it should descend
+    public float minMoveY; // Lowest value of Y when object is in motion before it should start ascending
     // Maximum number of this type of item that is allowed to be visible on the
     // screen at one time (prevent large items from cluttering the scene)
     public int maxNumInScene;
+    // Max number of this item that should be generated in the level
+    public int maxNumInLevel;
     public Direction[] directions;
     public int _id;
 }
@@ -38,6 +77,8 @@ public enum Direction
     up,
     down,
     wave,
+    arch_up, // n
+    arch_down, // u
 };
 
 public class GameItemsBehavior : MonoBehaviour
@@ -61,6 +102,12 @@ public class GameItemsBehavior : MonoBehaviour
     public GameObject boat1Prefab;
     public GameObject boat2Prefab;
     public GameObject shark1Prefab;
+    public GameObject beachBallPrefab;
+    public GameObject footballPrefab;
+    public GameObject palmTreePrefab;
+    public GameObject propPlanePrefab;
+    public GameObject stormCloud1;
+    public GameObject stormCloud2;
 
     // All trigger prefabs
     public GameObject eggPrefab;
@@ -70,15 +117,21 @@ public class GameItemsBehavior : MonoBehaviour
     public GameObject blueberriesPrefab;
     public GameObject strawberryPrefab;
 
-    public GameObstacle[] gameObstacles;
-    public GameObstacle[] gameCollectibles;
+    public GameObstacleBehavior[] gameObstacles;
+    public bool[] gameObstacleIndices;
+
+    public GameObstacleBehavior[] gameCollectibles;
+    public bool[] gameCollectibleIndices;
 
     public const float BASE_SPEED = 0.04f;
 
-    private Dictionary<int, int> obstacleCounts;
+    public const int ANY_AMOUNT_IN_LEVEL = -1;
+    public const int ANY_AMOUNT_IN_SCENE = -1;
+
+    private List<ObstacleCounter> obstacleCounts;
     private List<ObstaclePrefab> obstaclePrefabs;
 
-    private Dictionary<int, int> collectibleCounts;
+    private List<ObstacleCounter> collectibleCounts;
     private List<ObstaclePrefab> collectiblePrefabs;
 
     private System.Random sysRandom;
@@ -94,6 +147,8 @@ public class GameItemsBehavior : MonoBehaviour
     private float cameraMaxX;
     private float backgroundMinY;
     private float backgroundMaxY;
+
+    public bool active;
 
     private enum ItemIds
     {
@@ -122,6 +177,12 @@ public class GameItemsBehavior : MonoBehaviour
         boat1Id,
         boat2Id,
         shark1Id,
+        beachBallId,
+        footballId,
+        palmTreeId,
+        propPlaneId,
+        stormCloud1Id,
+        stormCloud2Id,
     }
 
     private void Awake()
@@ -129,10 +190,10 @@ public class GameItemsBehavior : MonoBehaviour
         // DO NOT SEED THIS RANDOM
         sysRandom = new System.Random();
 
-        obstacleCounts = new Dictionary<int, int>();
+        obstacleCounts = new List<ObstacleCounter>();
         obstaclePrefabs = new List<ObstaclePrefab>();
 
-        collectibleCounts = new Dictionary<int, int>();
+        collectibleCounts = new List<ObstacleCounter>();
         collectiblePrefabs = new List<ObstaclePrefab>();
     }
 
@@ -140,28 +201,42 @@ public class GameItemsBehavior : MonoBehaviour
     {
         for (; ; )
         {
-            for (int i = 0; i < gameObstacles.Length; ++i)
+            for (int i = 0; i < gameObstacleIndices.Length; ++i)
             {
-                if (gameObstacles[i].used)
+                if (gameObstacleIndices[i])
                 {
-                    Renderer r = gameObstacles[i].renderer;
-                    if (r.bounds.max.x < (-1 * cameraMaxX))
+                    if (gameObstacles[i].cleanup)
                     {
-                        GameObject obj = gameObstacles[i].gameObject;
-                        RemoveObstacleFromGame(obj);
+                        int ocIndex = obstacleCounts.FindIndex(gc => gc.id == gameObstacles[i]._id);
+                        if (ocIndex >= 0)
+                        {
+                            ObstacleCounter oc = obstacleCounts[ocIndex];
+                            oc.DecrementSceneCount();
+                            obstacleCounts[ocIndex] = oc;
+                        }
+                        Destroy(gameObstacles[i].gameObject);
+                        gameObstacleIndices[i] = false;
+                        obstacleMaxChance += OBSTACLE_CHANCE_CHANGE;
                     }
                 }
             }
 
-            for (int i = 0; i < gameCollectibles.Length; ++i)
+            for (int i = 0; i < gameCollectibleIndices.Length; ++i)
             {
-                if (gameCollectibles[i].used)
+                if (gameCollectibleIndices[i])
                 {
-                    Renderer r = gameCollectibles[i].renderer;
-                    if (r.bounds.max.x < (-1 * cameraMaxX))
+                    if (gameCollectibles[i].cleanup)
                     {
-                        GameObject obj = gameCollectibles[i].gameObject;
-                        RemoveCollectibleFromGame(obj);
+                        int ocIndex = collectibleCounts.FindIndex(gc => gc.id == gameCollectibles[i]._id);
+                        if (ocIndex >= 0)
+                        {
+                            ObstacleCounter oc = collectibleCounts[ocIndex];
+                            oc.DecrementSceneCount();
+                            collectibleCounts[ocIndex] = oc;
+                        }
+                        Destroy(gameCollectibles[i].gameObject);
+                        gameCollectibleIndices[i] = false;
+                        collectibleMaxChance += COLLECTIBLE_CHANCE_CHANGE;
                     }
                 }
             }
@@ -170,91 +245,27 @@ public class GameItemsBehavior : MonoBehaviour
         }
     }
 
-    public void UpdateGameObstaclePositions()
-    {
-        UpdateGameObjectPositions(gameObstacles);
-    }
-
-    public void UpdateGameCollectiblePositions()
-    {
-        UpdateGameObjectPositions(gameCollectibles);
-    }
-
-    private void UpdateGameObjectPositions(GameObstacle[] array)
-    {
-        for (int i = 0; i < array.Length; ++i)
-        {
-            if (array[i].used)
-            {
-                Transform t = array[i].transform;
-                Vector3 pos = t.localPosition;
-                pos.x -= array[i].xDelta;
-
-                switch (array[i].direction)
-                {
-                    case Direction.down:
-                        pos.y += array[i].yDelta;
-                        break;
-
-                    case Direction.up:
-                        pos.y += array[i].yDelta;
-                        break;
-
-                    case Direction.wave:
-                        if (array[i].incrementY)
-                        {
-                            pos.y += array[i].yDelta;
-                            if (pos.y >= array[i].endY)
-                            {
-                                array[i].incrementY = false;
-                                array[i].transform.rotation = new Quaternion(0, 0, 0.3f, 1.0f);
-                            }
-                        }
-                        else
-                        {
-                            pos.y -= array[i].yDelta;
-                            if (pos.y <= array[i].startY)
-                            {
-                                array[i].incrementY = true;
-                                array[i].transform.rotation = new Quaternion(0, 0, -0.3f, 1.0f);
-                            }
-                        }
-                        break;
-                }
-
-                t.localPosition = pos;
-            }
-        }
-    }
-
     public void RemoveCollectibleFromGame(GameObject obj)
     {
-        for (int i = 0; i < gameCollectibles.Length; ++i)
+        for (int i = 0; i < gameCollectibleIndices.Length; ++i)
         {
-            GameObject go = gameCollectibles[i].gameObject;
-            if (obj == go)
+            if (gameCollectibleIndices[i])
             {
-                Destroy(go);
-                gameCollectibles[i].used = false;
+                if (gameCollectibles[i].gameObject == obj)
+                {
+                    int ocIndex = collectibleCounts.FindIndex(gc => gc.id == gameCollectibles[i]._id);
+                    if (ocIndex >= 0)
+                    {
+                        ObstacleCounter oc = collectibleCounts[ocIndex];
+                        oc.DecrementSceneCount();
+                        collectibleCounts[ocIndex] = oc;
+                    }
+                    Destroy(gameCollectibles[i].gameObject);
+                    gameCollectibleIndices[i] = false;
+                    collectibleMaxChance += COLLECTIBLE_CHANCE_CHANGE;
+                }
             }
         }
-
-        collectibleMaxChance += COLLECTIBLE_CHANCE_CHANGE;
-    }
-
-    public void RemoveObstacleFromGame(GameObject obj)
-    {
-        for (int i = 0; i < gameObstacles.Length; ++i)
-        {
-            GameObject go = gameObstacles[i].gameObject;
-            if (obj == go)
-            {
-                Destroy(go);
-                gameObstacles[i].used = false;
-                obstacleCounts[gameObstacles[i]._id] -= 1;
-            }
-        }
-        obstacleMaxChance += OBSTACLE_CHANCE_CHANGE;
     }
 
     public void InitGameObjectManager(float cameraMaxX, float backgroundMinY,
@@ -264,8 +275,12 @@ public class GameItemsBehavior : MonoBehaviour
         this.cameraMaxX = cameraMaxX;
         this.backgroundMinY = backgroundMinY;
         this.backgroundMaxY = backgroundMaxY;
-        gameObstacles = new GameObstacle[numObstacles];
-        gameCollectibles = new GameObstacle[numCollectibles];
+
+        gameObstacles = new GameObstacleBehavior[numObstacles];
+        gameObstacleIndices = new bool[numObstacles];
+
+        gameCollectibles = new GameObstacleBehavior[numCollectibles];
+        gameCollectibleIndices = new bool[numCollectibles];
 
         StartCoroutine(CheckItemsForRemoval());
     }
@@ -293,100 +308,85 @@ public class GameItemsBehavior : MonoBehaviour
         return 0;
     }
 
-    private int FindAvailableArraySlot(GameObstacle[] array)
+    private int FindAvailableArraySlot(bool[] array)
     {
-        if (array.Length > 0)
+        // Last index of the obstacle and collectible arrays are for special items
+        for (int i = 0; i < array.Length - 1; ++i)
         {
-            for (int i = 0; i < array.Length; ++i)
+            if (!array[i])
             {
-                if (false == array[i].used)
-                {
-                    return i;
-                }
+                return i;
             }
         }
 
         return -1;
     }
 
-    private bool IsFloatingObject(GameObject prefab)
+    public void StopGame()
     {
-        if (prefab == enemyBird1Prefab ||
-            prefab == blimp1Prefab ||
-            prefab == blimp2Prefab ||
-            prefab == plane1Prefab ||
-            prefab == plane2Prefab ||
-            prefab == parachute1Prefab ||
-            prefab == parachute2Prefab ||
-            prefab == parachute3Prefab ||
-            prefab == balloon1Prefab ||
-            prefab == balloon2Prefab ||
-            prefab == balloon3Prefab)
+        for (int i = 0; i < gameObstacleIndices.Length; ++i)
         {
-            return true;
-        }
-
-        return false;
-    }
-
-    private float GetMaxObjectBound()
-    {
-        float max = 0f;
-        for (int i = 0; i < gameObstacles.Length; ++i)
-        {
-            if (gameObstacles[i].used)
+            if (gameObstacleIndices[i])
             {
-                Renderer r = gameObstacles[i].renderer;
-                if (null != r)
-                {
-                    if (r.bounds.max.x > max)
-                    {
-                        max = r.bounds.max.x;
-                    }
-                }
+                gameObstacles[i].active = false;
             }
         }
 
-        return max;
+        for (int i = 0; i < gameCollectibleIndices.Length; ++i)
+        {
+            if (gameCollectibleIndices[i])
+            {
+                gameCollectibles[i].active = false;
+            }
+        }
+
+        active = false;
+    }
+
+    public void StartGame()
+    {
+        for (int i = 0; i < gameObstacleIndices.Length; ++i)
+        {
+            if (gameObstacleIndices[i])
+            {
+                gameObstacles[i].active = true;
+            }
+        }
+
+        for (int i = 0; i < gameCollectibleIndices.Length; ++i)
+        {
+            if (gameCollectibleIndices[i])
+            {
+                gameCollectibles[i].active = true;
+            }
+        }
+
+        active = true;
     }
 
     public void GenerateFinishLine()
     {
         int arrayIndex = gameObstacles.Length - 1;
 
+        ObstaclePrefab op = new ObstaclePrefab();
+        op._id = (int)ItemIds.finishLineId;
+        op.startX = finishLinePrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = BASE_SPEED;
+        op.maxSpeed = BASE_SPEED;
+
         GameObject finishLine = Instantiate(finishLinePrefab);
-        float lineWidth = finishLine.GetComponent<Renderer>().bounds.size.x;
-        Vector3 pos = finishLine.transform.localPosition;
-        Vector3 newPos = new Vector3(cameraMaxX + lineWidth, pos.y, pos.z);
+        GameObstacleBehavior script = finishLine.GetComponent<GameObstacleBehavior>();
+        script.InitGameObstacle(op, false);
 
-        float maxObjectX = GetMaxObjectBound();
-        if (maxObjectX > newPos.x)
-        {
-            newPos.x = maxObjectX + lineWidth;
-            finishLine.transform.localPosition = newPos;
-        }
-        else
-        {
-            finishLine.transform.localPosition = newPos;
-        }
-
-        GameObstacle go = new GameObstacle();
-        go.gameObject = finishLine;
-        go._id = (int)ItemIds.finishLineId;
-        go.transform = go.gameObject.transform;
-        go.renderer = go.gameObject.GetComponent<Renderer>();
-        // Don't need to get the collider for this object
-        go.xDelta = BASE_SPEED;
-        go.direction = Direction.none;
-        go.used = true;
-
-        gameObstacles[arrayIndex] = go;
+        gameObstacles[arrayIndex] = script;
+        gameObstacleIndices[arrayIndex] = true;
     }
 
     public void GenerateNewObstacle(bool disableColliders)
     {
-        int arrayIndex = FindAvailableArraySlot(gameObstacles);
-        if (arrayIndex < 0 || (gameObstacles.Length - 1) == arrayIndex)
+        int arrayIndex = FindAvailableArraySlot(gameObstacleIndices);
+        if (arrayIndex < 0)
         {
             // No slots available at this time (saving the last one for the finish line)
             return;
@@ -397,185 +397,121 @@ public class GameItemsBehavior : MonoBehaviour
         {
             int opIndex = SelectPrefab(obstaclePrefabs, true);
             ObstaclePrefab op = obstaclePrefabs[opIndex];
-            if (obstacleCounts[op._id] >= op.maxNumInScene && op.maxNumInScene > 0)
+            int ocIndex = obstacleCounts.FindIndex(gc => gc.id == op._id);
+            ObstacleCounter oc = obstacleCounts[ocIndex];
+            if ((oc.countInScene >= op.maxNumInScene) && op.maxNumInScene > 0)
             {
-                /*
-                 * Some obstacles are large or difficult to avoid, so we use
-                 * .maxNumInScene to determine a limit for how many of these
-                 * obstacles should be allowed to be on screen at any given moment.
-                 * We increment this value below, but decrement it when removing
-                 * that item from the scene.
-                 * 
-                 * maxNumInScene of -1 means there is no limit; if it's >0, then
-                 * we abide by that limit.
-                 */
+                // Obey the limit for how many can be displayed in the scene at any given time
+                return;
+            }
+            if ((oc.countInLevel >= op.maxNumInLevel) && op.maxNumInLevel > 0)
+            {
+                // Obey the limit for how many can be displayed in the level at any given time
                 return;
             }
 
             // Increment the count
-            obstacleCounts[op._id] += 1;
+            oc.IncrementSceneCount();
+            oc.IncrementLevelCount();
+            obstacleCounts[ocIndex] = oc;
 
-            GameObstacle go = new GameObstacle();
-            go.gameObject = Instantiate(op.prefab);
-            go._id = op._id;
-            go.transform = go.gameObject.transform;
-            go.renderer = go.gameObject.GetComponent<Renderer>();
-            go.collider = go.gameObject.GetComponent<PolygonCollider2D>();
-            go.xDelta = Random.Range(op.minSpeed, op.maxSpeed);
+            GameObject obj = Instantiate(op.prefab);
+            GameObstacleBehavior script = obj.GetComponent<GameObstacleBehavior>();
+            script.InitGameObstacle(op, disableColliders);
 
-            Direction d = op.directions[(Random.Range(0, op.directions.Length))];
-            switch (d)
-            {
-                case Direction.up:
-                    go.yDelta = Random.Range(0.0005f, 0.006f);
-                    break;
+            gameObstacles[arrayIndex] = script;
+            gameObstacleIndices[arrayIndex] = true;
 
-                case Direction.down:
-                    go.yDelta = -1 * Random.Range(0.0005f, 0.006f);
-                    break;
-
-                case Direction.wave:
-                    go.yDelta = Random.Range(0.08f, 0.10f);
-                    go.startY = go.transform.localPosition.y;
-                    go.endY = go.startY + Random.Range(backgroundMaxY * 0.6f, backgroundMaxY * 0.8f);
-                    go.incrementY = true;
-                    break;
-            }
-            go.direction = d;
-
-            // Set the position of the new obstacle within the game
-            Vector3 pos = go.transform.localPosition;
-            float objWidth = go.renderer.bounds.size.x;
-            pos.x = cameraMaxX + objWidth;
-            if (IsFloatingObject(op.prefab))
-            {
-                // If the object isn't something that needs to "remain" on the
-                // ground, randomize it's starting Y position
-                pos.y = Random.Range(backgroundMinY, backgroundMaxY);
-            }
-            go.transform.localPosition = pos;
-
-            if (disableColliders)
-            {
-                go.collider.enabled = false;
-            }
-
-            go.used = true;
-
-            gameObstacles[arrayIndex] = go;
             obstacleMaxChance -= OBSTACLE_CHANCE_CHANGE;
         }
     }
 
-    private void GenerateEgg()
+    public void GenerateNewCollectible(bool timeToGenerateNewEgg)
     {
-        int arrayIndex = gameCollectibles.Length - 1;
+        int arrayIndex;
 
-        GameObstacle go = new GameObstacle();
-        GameObject egg = Instantiate(eggPrefab);
-        go.gameObject = egg;
-        go.transform = go.gameObject.transform;
-        go.renderer = go.gameObject.GetComponent<Renderer>();
-        go.xDelta = BASE_SPEED;
-        go.direction = Direction.none;
-        go.used = true;
-
-        Vector3 pos = go.transform.localPosition;
-        float objWidth = go.renderer.bounds.size.x;
-        pos.x = cameraMaxX + objWidth;
-        pos.y = (sysRandom.Next((int)backgroundMinY * 100, (int)backgroundMaxY * 100) / 100);
-        go.transform.localPosition = pos;
-
-        gameCollectibles[arrayIndex] = go;
-    }
-
-    public void GenerateNewCollectible(bool generateEgg)
-    {
-        if (generateEgg)
+        if (timeToGenerateNewEgg)
         {
-            GenerateEgg();
+            arrayIndex = gameCollectibles.Length - 1;
+
+            ObstaclePrefab op = new ObstaclePrefab();
+            op._id = (int)ItemIds.eggId;
+            op.startX = eggPrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+            op.endX = op.startX * -1;
+            op.minGenY = -1f;
+            op.maxGenY = 1f;
+            op.minSpeed = BASE_SPEED;
+            op.maxSpeed = BASE_SPEED;
+
+            GameObject egg = Instantiate(eggPrefab);
+            GameObstacleBehavior script = egg.GetComponent<GameObstacleBehavior>();
+            script.InitGameObstacle(op, false);
+
+            gameCollectibles[arrayIndex] = script;
+            gameCollectibleIndices[arrayIndex] = true;
+
             return;
         }
 
-        int arrayIndex = FindAvailableArraySlot(gameCollectibles);
-        if (arrayIndex < 0 || (gameCollectibles.Length - 1) == arrayIndex)
+        arrayIndex = FindAvailableArraySlot(gameCollectibleIndices);
+        if (arrayIndex < 0)
         {
-            // No slots available at this time
+            // No slots available at this time (saving the last one for the finish line)
             return;
         }
 
-        float chance = (float) sysRandom.NextDouble();
-        if (chance < collectibleMaxChance)
+        float chance = Random.Range(0f, 1f);
+        if (chance <= collectibleMaxChance)
         {
-            int cpIndex = SelectPrefab(collectiblePrefabs, false);
-            ObstaclePrefab op = collectiblePrefabs[cpIndex];
-
-            if (collectibleCounts[op._id] >= op.maxNumInScene && op.maxNumInScene > 0)
+            int opIndex = SelectPrefab(collectiblePrefabs, false);
+            ObstaclePrefab op = collectiblePrefabs[opIndex];
+            int ocIndex = collectibleCounts.FindIndex(gc => gc.id == op._id);
+            ObstacleCounter oc = collectibleCounts[ocIndex];
+            if ((oc.countInScene >= op.maxNumInScene) && op.maxNumInScene > 0)
             {
-                /*
-                 * Some collectibles should only be generated X number of times in
-                 * a given level/scene. Once we reach that number, we don't generate
-                 * anymore. This differs from game obstacles (above) in which
-                 * .maxNumInScene means the number of that type of item that is
-                 * allowed to be on screen at any given time.
-                 *
-                 * maxNumInScene of -1 means there is no limit; if it's >0, then
-                 * we abide by that limit.
-                 *
-                 * We increment this number in this function but never decrement it.
-                 */
+                // Obey the limit for how many can be displayed in the scene at any given time
+                return;
+            }
+            if ((oc.countInLevel >= op.maxNumInLevel) && op.maxNumInLevel > 0)
+            {
+                // Obey the limit for how many can be displayed in the level at any given time
                 return;
             }
 
-            collectibleCounts[op._id] += 1;
+            // Increment the count
+            oc.IncrementSceneCount();
+            oc.IncrementLevelCount();
+            collectibleCounts[ocIndex] = oc;
 
-            GameObstacle go = new GameObstacle();
-            go.gameObject = Instantiate(op.prefab);
-            go.transform = go.gameObject.transform;
-            go.renderer = go.gameObject.GetComponent<Renderer>();
-            // XXX Maybe change this up a bit; collectibles should really only move at 1 speed
-            go.xDelta = op.minSpeed;
+            GameObject obj = Instantiate(op.prefab);
+            GameObstacleBehavior script = obj.GetComponent<GameObstacleBehavior>();
+            script.InitGameObstacle(op, false);
 
-            Vector3 pos = go.transform.localPosition;
-            float objWidth = go.renderer.bounds.size.x;
-            pos.x = cameraMaxX + objWidth;
-            pos.y = (sysRandom.Next((int)backgroundMinY * 100, (int)backgroundMaxY * 100) / 100);
-            go.transform.localPosition = pos;
+            gameCollectibles[arrayIndex] = script;
+            gameCollectibleIndices[arrayIndex] = true;
 
-            go.used = true;
-            gameCollectibles[arrayIndex] = go;
             collectibleMaxChance -= COLLECTIBLE_CHANCE_CHANGE;
         }
     }
 
     public void DisableColliders()
     {
-        for (int i = 0; i < gameObstacles.Length; ++i)
+        for (int i = 0; i < gameObstacleIndices.Length; ++i)
         {
-            if (gameObstacles[i].used)
+            if (gameObstacleIndices[i])
             {
-                GameObject obj = gameObstacles[i].gameObject;
-                PolygonCollider2D pc = gameObstacles[i].collider;
-                if (obj.tag != "FinishLine" && obj.tag != "Collectible")
-                {
-                    pc.enabled = false;
-                }
+                gameObstacles[i].disableColliders = true;
             }
         }
     }
 
     public void EnableColliders()
     {
-        for (int i = 0; i < gameObstacles.Length; ++i)
+        for (int i = 0; i < gameObstacleIndices.Length; ++i)
         {
-            if (gameObstacles[i].used)
+            if (gameObstacleIndices[i])
             {
-                GameObject obj = gameObstacles[i].gameObject;
-                PolygonCollider2D pc = gameObstacles[i].collider;
-                if (obj.tag != "FinishLine" && obj.tag != "Collectible")
-                {
-                    pc.enabled = true;
-                }
+                gameObstacles[i].disableColliders = false;
             }
         }
     }
@@ -584,8 +520,10 @@ public class GameItemsBehavior : MonoBehaviour
     /*
      * Obstacle generation helper functions
      */
-    public void AddEnemyBirdObstacle(int maxNum, float minSpeed, float maxSpeed,
-                                     float minChance, float maxChance)
+    public void AddEnemyBirdObstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                     float maxSpeed, float minChance, float maxChance,
+                                     float minGenY, float maxGenY, float minMoveY,
+                                     float maxMoveY)
     {
         Direction[] directions =
         {
@@ -593,167 +531,479 @@ public class GameItemsBehavior : MonoBehaviour
             Direction.up
         };
 
-        AddObstacle(enemyBird1Prefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.enemyBird1Id);
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = enemyBird1Prefab;
+        op.startX = enemyBird1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.enemyBird1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
-    public void AddWaveObstacle(int maxNum, float minSpeed, float maxSpeed,
-                                     float minChance, float maxChance)
+    public void AddWaveObstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                float maxSpeed, float minChance, float maxChance,
+                                float minGenY, float maxGenY, float minMoveY,
+                                float maxMoveY)
     {
         Direction[] directions =
         {
             Direction.none
         };
 
-        AddObstacle(wavePrefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.waveId);
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = wavePrefab;
+        op.startX = wavePrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.waveId;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
-    public void AddFish1Obstacle(int maxNum, float minSpeed, float maxSpeed,
-                                 float minChance, float maxChance)
+    public void AddFish1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                 float maxSpeed, float minChance, float maxChance,
+                                 float minGenY, float maxGenY, float minMoveY,
+                                 float maxMoveY)
     {
         Direction[] directions =
         {
             Direction.wave
         };
 
-        AddObstacle(fish1Prefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.fish1Id);
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = fish1Prefab;
+        op.startX = fish1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.fish1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
-    public void AddFish2Obstacle(int maxNum, float minSpeed, float maxSpeed,
-                                 float minChance, float maxChance)
+    public void AddFish2Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                 float maxSpeed, float minChance, float maxChance,
+                                 float minGenY, float maxGenY, float minMoveY,
+                                 float maxMoveY)
     {
         Direction[] directions =
         {
             Direction.wave
         };
 
-        AddObstacle(fish2Prefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.fish2Id);
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = fish2Prefab;
+        op.startX = fish2Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.fish2Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
-    public void AddFish3Obstacle(int maxNum, float minSpeed, float maxSpeed,
-                                 float minChance, float maxChance)
+    public void AddFish3Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                 float maxSpeed, float minChance, float maxChance,
+                                 float minGenY, float maxGenY, float minMoveY,
+                                 float maxMoveY)
     {
         Direction[] directions =
         {
             Direction.wave
         };
 
-        AddObstacle(fish3Prefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.fish3Id);
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = fish3Prefab;
+        op.startX = fish3Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.fish3Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
-    public void AddBoat1Obstacle(int maxNum, float minSpeed, float maxSpeed,
-                                 float minChance, float maxChance)
+    public void AddBoat1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                 float maxSpeed, float minChance, float maxChance,
+                                 float minGenY, float maxGenY, float minMoveY,
+                                 float maxMoveY)
     {
         Direction[] directions =
         {
            Direction.none
         };
 
-        AddObstacle(boat1Prefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.boat1Id);
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = boat1Prefab;
+        op.startX = boat1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.boat1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
-    public void AddShark1Obstacle(int maxNum, float minSpeed, float maxSpeed,
-                                  float minChance, float maxChance)
+    public void AddShark1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                  float maxSpeed, float minChance, float maxChance,
+                                  float minGenY, float maxGenY, float minMoveY,
+                                  float maxMoveY)
     {
         Direction[] directions =
         {
             Direction.none
         };
 
-        AddObstacle(shark1Prefab, directions, maxNum, minSpeed, maxSpeed,
-                    minChance, maxChance, ItemIds.shark1Id);
-    }
-
-    private void AddObstacle(GameObject prefab, Direction[] directions, int maxNum,
-                             float minSpeed, float maxSpeed, float minChance,
-                             float maxChance, ItemIds _id)
-    {
         ObstaclePrefab op = new ObstaclePrefab();
-        op.prefab = prefab;
+        op.prefab = shark1Prefab;
+        op.startX = shark1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
         op.minSpeed = minSpeed;
         op.maxSpeed = maxSpeed;
         op.minChance = minChance;
         op.maxChance = maxChance;
-        op.maxNumInScene = maxNum;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
         op.directions = directions;
-        op._id = (int)_id;
+        op._id = (int)ItemIds.shark1Id;
 
         obstaclePrefabs.Add(op);
-        obstacleCounts.Add(op._id, 0);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddBeachBallObstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                     float maxSpeed, float minChance, float maxChance,
+                                     float minGenY, float maxGenY, float minMoveY,
+                                     float maxMoveY)
+    {
+        Direction[] directions =
+        {
+            Direction.arch_up
+        };
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = beachBallPrefab;
+        op.startX = beachBallPrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.beachBallId;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddFootballObstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                    float maxSpeed, float minChance, float maxChance,
+                                    float minGenY, float maxGenY, float minMoveY,
+                                    float maxMoveY)
+    {
+        Direction[] directions =
+        {
+            Direction.arch_up
+        };
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = footballPrefab;
+        op.startX = footballPrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.footballId;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddPalmTreeObstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                    float maxSpeed, float minChance, float maxChance,
+                                    float minGenY, float maxGenY, float minMoveY,
+                                    float maxMoveY)
+    {
+        Direction[] directions =
+        {
+            Direction.none
+        };
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = palmTreePrefab;
+        op.startX = palmTreePrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.palmTreeId;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddPropPlaneObstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                     float maxSpeed, float minChance, float maxChance,
+                                     float minGenY, float maxGenY, float minMoveY,
+                                     float maxMoveY)
+    {
+        Direction[] directions =
+        {
+            Direction.none
+        };
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = propPlanePrefab;
+        op.startX = propPlanePrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.propPlaneId;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddStormCloud1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                      float maxSpeed, float minChance, float maxChance,
+                                      float minGenY, float maxGenY, float minMoveY,
+                                      float maxMoveY)
+    {
+        Direction[] directions =
+        {
+            Direction.none
+        };
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = stormCloud1;
+        op.startX = stormCloud1.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.stormCloud1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddStormCloud2Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                      float maxSpeed, float minChance, float maxChance,
+                                      float minGenY, float maxGenY, float minMoveY,
+                                      float maxMoveY)
+    {
+        Direction[] directions =
+        {
+            Direction.none
+        };
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = stormCloud2;
+        op.startX = stormCloud2.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op.directions = directions;
+        op._id = (int)ItemIds.stormCloud2Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 
 
     /*
      * Collectible generation helper functions
      */
-    public void AddCoinCollectible(int maxNum, float minSpeed, float maxSpeed,
-                                   float minChance, float maxChance)
+    public void AddCoinCollectible(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                   float maxSpeed, float minChance, float maxChance,
+                                   float minGenY, float maxGenY)
     {
         Direction[] directions =
         {
             Direction.none
         };
 
-        AddCollectible(coinPrefab, directions, maxNum, minSpeed, maxSpeed,
-                       minChance, maxChance, ItemIds.coinId);
+        AddCollectible(coinPrefab, directions, maxNumInScene, maxNumInLevel,
+                       minSpeed, maxSpeed, minChance, maxChance, minGenY, maxGenY,
+                       ItemIds.coinId);
     }
 
-    public void AddBananaCollectible(int maxNum, float minSpeed, float maxSpeed,
-                                     float minChance, float maxChance)
+    public void AddBananaCollectible(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                     float maxSpeed, float minChance, float maxChance,
+                                     float minGenY, float maxGenY)
     {
         Direction[] directions =
         {
             Direction.none
         };
 
-        AddCollectible(bananaPrefab, directions, maxNum, minSpeed, maxSpeed,
-                       minChance, maxChance, ItemIds.bananaId);
+        AddCollectible(bananaPrefab, directions, maxNumInScene, maxNumInLevel,
+                       minSpeed, maxSpeed, minChance, maxChance, minGenY, maxGenY,
+                       ItemIds.bananaId);
     }
 
-    public void AddBlueberryCollectible(int maxNum, float minSpeed, float maxSpeed,
-                                        float minChance, float maxChance)
+    public void AddBlueberryCollectible(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                        float maxSpeed, float minChance, float maxChance,
+                                        float minGenY, float maxGenY)
     {
         Direction[] directions =
         {
             Direction.none
         };
 
-        AddCollectible(blueberriesPrefab, directions, maxNum, minSpeed, maxSpeed,
-                       minChance, maxChance, ItemIds.blueberryId);
+        AddCollectible(blueberriesPrefab, directions, maxNumInScene, maxNumInLevel,
+                       minSpeed, maxSpeed, minChance, maxChance, minGenY, maxGenY,
+                       ItemIds.blueberryId);
     }
 
-    public void AddStrawberryCollectible(int maxNum, float minSpeed, float maxSpeed,
-                                         float minChance, float maxChance)
+    public void AddStrawberryCollectible(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                         float maxSpeed, float minChance, float maxChance,
+                                         float minGenY, float maxGenY)
     {
         Direction[] directions =
         {
             Direction.none
         };
 
-        AddCollectible(strawberryPrefab, directions, maxNum, minSpeed, maxSpeed,
-                       minChance, maxChance, ItemIds.strawberryId);
+        AddCollectible(strawberryPrefab, directions, maxNumInScene, maxNumInLevel,
+                       minSpeed, maxSpeed, minChance, maxChance, minGenY, maxGenY,
+                       ItemIds.strawberryId);
     }
 
-    private void AddCollectible(GameObject prefab, Direction[] directions, int maxNum,
-                                float minSpeed, float maxSpeed, float minChance,
-                                float maxChance, ItemIds _id)
+    private void AddCollectible(GameObject prefab, Direction[] directions, int maxNumInScene,
+                                int maxNumInLevel, float minSpeed, float maxSpeed, float minChance,
+                                float maxChance, float minGenY, float maxGenY, ItemIds _id)
     {
         ObstaclePrefab op = new ObstaclePrefab();
         op.prefab = prefab;
-        op.maxNumInScene = maxNum;
+        op.startX = prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
         op.minSpeed = minSpeed;
         op.maxSpeed = maxSpeed;
         op.minChance = minChance;
         op.maxChance = maxChance;
+        op.minGenY = minGenY;
+        op.maxGenY = maxGenY;
         op.directions = directions;
         op._id = (int)_id;
 
         collectiblePrefabs.Add(op);
-        collectibleCounts.Add(op._id, 0);
+        collectibleCounts.Add(new ObstacleCounter(op._id, 0, 0));
     }
 }

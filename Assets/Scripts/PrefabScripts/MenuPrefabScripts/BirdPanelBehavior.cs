@@ -31,6 +31,7 @@ public class BirdPanelBehavior : MonoBehaviour
 
     public VideoClip samHatchingVideoClip;
     public VideoClip nigelHatchingVideoClip;
+    public VideoClip stevenHatchingVideoClip;
 
     public GameObject notificationCanvasPrefab;
     private GameObject buttonNotification;
@@ -165,6 +166,10 @@ public class BirdPanelBehavior : MonoBehaviour
 
             case InventoryData.NIGEL_ID:
                 videoPlayer.clip = nigelHatchingVideoClip;
+                break;
+
+            case InventoryData.STEVEN_ID:
+                videoPlayer.clip = stevenHatchingVideoClip;
                 break;
 
             default:

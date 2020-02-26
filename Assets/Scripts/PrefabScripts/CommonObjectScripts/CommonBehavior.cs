@@ -84,6 +84,7 @@ public class CommonBehavior : MonoBehaviour
     public GameObject kokoPrefab;
     public GameObject samPrefab;
     public GameObject nigelPrefab;
+    public GameObject stevenPrefab;
 
     private GameObject birdObject;
     private BirdBehavior birdScript;
@@ -991,6 +992,9 @@ public class CommonBehavior : MonoBehaviour
 
             case InventoryData.NIGEL_ID:
                 return nigelPrefab;
+
+            case InventoryData.STEVEN_ID:
+                return stevenPrefab;
 
             default:
                 PlayerPrefsCommon.SetActiveBirdId(InventoryData.KOKO_ID);

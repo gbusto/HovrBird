@@ -17,6 +17,9 @@ public class LevelSelectorBehavior : MonoBehaviour
     public Sprite waterSeriesUnlockedLevelSprite;
     public Sprite waterSeriesLockedLevelSprite;
 
+    public Sprite beachSeriesUnlockedLevelSprite;
+    public Sprite beachSeriesLockedLevelSprite;
+
     // Landscape canvas items
     public Button landscapeReturnToMenuButton;
     public GameObject landscapeHowtoPopup;
@@ -37,6 +40,12 @@ public class LevelSelectorBehavior : MonoBehaviour
     public Button wsLandscapeLevel9Button;
     public Button wsLandscapeLevel10Button;
 
+    public Button bsLandscapeLevel11Button;
+    public Button bsLandscapeLevel12Button;
+    public Button bsLandscapeLevel13Button;
+    public Button bsLandscapeLevel14Button;
+    public Button bsLandscapeLevel15Button;
+
     public Text ssLandscapeLevel1Text;
     public Text ssLandscapeLevel2Text;
     public Text ssLandscapeLevel3Text;
@@ -48,6 +57,12 @@ public class LevelSelectorBehavior : MonoBehaviour
     public Text wsLandscapeLevel8Text;
     public Text wsLandscapeLevel9Text;
     public Text wsLandscapeLevel10Text;
+
+    public Text bsLandscapeLevel11Text;
+    public Text bsLandscapeLevel12Text;
+    public Text bsLandscapeLevel13Text;
+    public Text bsLandscapeLevel14Text;
+    public Text bsLandscapeLevel15Text;
 
 
     // Portrait canvas items
@@ -71,6 +86,12 @@ public class LevelSelectorBehavior : MonoBehaviour
     public Button wsPortraitLevel9Button;
     public Button wsPortraitLevel10Button;
 
+    public Button bsPortraitLevel11Button;
+    public Button bsPortraitLevel12Button;
+    public Button bsPortraitLevel13Button;
+    public Button bsPortraitLevel14Button;
+    public Button bsPortraitLevel15Button;
+
     public Text ssPortraitLevel1Text;
     public Text ssPortraitLevel2Text;
     public Text ssPortraitLevel3Text;
@@ -82,6 +103,12 @@ public class LevelSelectorBehavior : MonoBehaviour
     public Text wsPortraitLevel8Text;
     public Text wsPortraitLevel9Text;
     public Text wsPortraitLevel10Text;
+
+    public Text bsPortraitLevel11Text;
+    public Text bsPortraitLevel12Text;
+    public Text bsPortraitLevel13Text;
+    public Text bsPortraitLevel14Text;
+    public Text bsPortraitLevel15Text;
 
 
     public GameObject levelChanger;
@@ -124,6 +151,9 @@ public class LevelSelectorBehavior : MonoBehaviour
                 portraitHowtoPopup.SetActive(false);
             }
 
+            /*
+             * Sky Series Level Start
+             */
             ssPortraitLevel1Button.onClick.AddListener(PlayLevel1);
             if (levelData.levelData.level1Complete)
             {
@@ -131,18 +161,21 @@ public class LevelSelectorBehavior : MonoBehaviour
                 ssPortraitLevel2Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssPortraitLevel2Text.text = "2";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete)
             {
                 ssPortraitLevel3Button.onClick.AddListener(PlayLevel3);
                 ssPortraitLevel3Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssPortraitLevel3Text.text = "3";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete)
             {
                 ssPortraitLevel4Button.onClick.AddListener(PlayLevel4);
                 ssPortraitLevel4Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssPortraitLevel4Text.text = "4";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete)
             {
@@ -150,6 +183,10 @@ public class LevelSelectorBehavior : MonoBehaviour
                 ssPortraitLevel5Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssPortraitLevel5Text.text = "5";
             }
+
+            /*
+             * Water Series Level Start
+             */
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete)
             {
@@ -157,6 +194,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsPortraitLevel6Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsPortraitLevel6Text.text = "6";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete)
             {
@@ -164,6 +202,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsPortraitLevel7Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsPortraitLevel7Text.text = "7";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
                 levelData.levelData.level7Complete)
@@ -172,6 +211,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsPortraitLevel8Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsPortraitLevel8Text.text = "8";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
                 levelData.levelData.level7Complete && levelData.levelData.level8Complete)
@@ -180,6 +220,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsPortraitLevel9Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsPortraitLevel9Text.text = "9";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
                 levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete)
@@ -187,6 +228,61 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsPortraitLevel10Button.onClick.AddListener(PlayLevel10);
                 wsPortraitLevel10Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsPortraitLevel10Text.text = "10";
+            }
+
+            /*
+             * Beach Series Level Start
+             */
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete)
+            {
+                bsPortraitLevel11Button.onClick.AddListener(PlayLevel11);
+                bsPortraitLevel11Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsPortraitLevel11Text.text = "11";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete)
+            {
+                bsPortraitLevel12Button.onClick.AddListener(PlayLevel12);
+                bsPortraitLevel12Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsPortraitLevel12Text.text = "12";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete && levelData.levelData.level12Complete)
+            {
+                bsPortraitLevel13Button.onClick.AddListener(PlayLevel13);
+                bsPortraitLevel13Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsPortraitLevel13Text.text = "13";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete && levelData.levelData.level12Complete &&
+                levelData.levelData.level13Complete)
+            {
+                bsPortraitLevel14Button.onClick.AddListener(PlayLevel14);
+                bsPortraitLevel14Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsPortraitLevel14Text.text = "14";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete && levelData.levelData.level12Complete &&
+                levelData.levelData.level13Complete && levelData.levelData.level14Complete)
+            {
+                bsPortraitLevel15Button.onClick.AddListener(PlayLevel15);
+                bsPortraitLevel15Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsPortraitLevel15Text.text = "15";
             }
         }
         else
@@ -215,6 +311,9 @@ public class LevelSelectorBehavior : MonoBehaviour
                 landscapeHowtoPopup.SetActive(false);
             }
 
+            /*
+             * Sky Series Level Start
+             */
             ssLandscapeLevel1Button.onClick.AddListener(PlayLevel1);
             if (levelData.levelData.level1Complete)
             {
@@ -222,24 +321,31 @@ public class LevelSelectorBehavior : MonoBehaviour
                 ssLandscapeLevel2Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssLandscapeLevel2Text.text = "2";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete)
             {
                 ssLandscapeLevel3Button.onClick.AddListener(PlayLevel3);
                 ssLandscapeLevel3Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssLandscapeLevel3Text.text = "3";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete)
             {
                 ssLandscapeLevel4Button.onClick.AddListener(PlayLevel4);
                 ssLandscapeLevel4Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssLandscapeLevel4Text.text = "4";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete && levelData.levelData.level4Complete)
             {
                 ssLandscapeLevel5Button.onClick.AddListener(PlayLevel5);
                 ssLandscapeLevel5Button.GetComponent<Image>().sprite = skySeriesUnlockedLevelSprite;
                 ssLandscapeLevel5Text.text = "5";
             }
+
+            /*
+             * Water Series Level Start
+             */
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete)
             {
@@ -247,6 +353,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsLandscapeLevel6Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsLandscapeLevel6Text.text = "6";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete)
             {
@@ -254,6 +361,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsLandscapeLevel7Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsLandscapeLevel7Text.text = "7";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
                 levelData.levelData.level7Complete)
@@ -262,6 +370,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsLandscapeLevel8Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsLandscapeLevel8Text.text = "8";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
                 levelData.levelData.level7Complete && levelData.levelData.level8Complete)
@@ -270,6 +379,7 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsLandscapeLevel9Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsLandscapeLevel9Text.text = "9";
             }
+
             if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
                 levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
                 levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete)
@@ -277,6 +387,61 @@ public class LevelSelectorBehavior : MonoBehaviour
                 wsLandscapeLevel10Button.onClick.AddListener(PlayLevel10);
                 wsLandscapeLevel10Button.GetComponent<Image>().sprite = waterSeriesUnlockedLevelSprite;
                 wsLandscapeLevel10Text.text = "10";
+            }
+
+            /*
+             * Beach Series Level Start
+             */
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete)
+            {
+                bsLandscapeLevel11Button.onClick.AddListener(PlayLevel11);
+                bsLandscapeLevel11Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsLandscapeLevel11Text.text = "11";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete)
+            {
+                bsLandscapeLevel12Button.onClick.AddListener(PlayLevel12);
+                bsLandscapeLevel12Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsLandscapeLevel12Text.text = "12";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete && levelData.levelData.level12Complete)
+            {
+                bsLandscapeLevel13Button.onClick.AddListener(PlayLevel13);
+                bsLandscapeLevel13Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsLandscapeLevel13Text.text = "13";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete && levelData.levelData.level12Complete &&
+                levelData.levelData.level13Complete)
+            {
+                bsLandscapeLevel14Button.onClick.AddListener(PlayLevel14);
+                bsLandscapeLevel14Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsLandscapeLevel14Text.text = "14";
+            }
+
+            if (levelData.levelData.level1Complete && levelData.levelData.level2Complete && levelData.levelData.level3Complete &&
+                levelData.levelData.level4Complete && levelData.levelData.level5Complete && levelData.levelData.level6Complete &&
+                levelData.levelData.level7Complete && levelData.levelData.level8Complete && levelData.levelData.level9Complete &&
+                levelData.levelData.level10Complete && levelData.levelData.level11Complete && levelData.levelData.level12Complete &&
+                levelData.levelData.level13Complete && levelData.levelData.level14Complete)
+            {
+                bsLandscapeLevel15Button.onClick.AddListener(PlayLevel15);
+                bsLandscapeLevel15Button.GetComponent<Image>().sprite = beachSeriesUnlockedLevelSprite;
+                bsLandscapeLevel15Text.text = "15";
             }
         }
     }
@@ -357,5 +522,35 @@ public class LevelSelectorBehavior : MonoBehaviour
     {
         LevelManager.SetLevelNumber(10);
         levelChangerScript.FadeToScene("WaterSeriesScene");
+    }
+
+    public void PlayLevel11()
+    {
+        LevelManager.SetLevelNumber(11);
+        levelChangerScript.FadeToScene("BeachSeriesScene");
+    }
+
+    public void PlayLevel12()
+    {
+        LevelManager.SetLevelNumber(12);
+        levelChangerScript.FadeToScene("BeachSeriesScene");
+    }
+
+    public void PlayLevel13()
+    {
+        LevelManager.SetLevelNumber(13);
+        levelChangerScript.FadeToScene("BeachSeriesScene");
+    }
+
+    public void PlayLevel14()
+    {
+        LevelManager.SetLevelNumber(14);
+        levelChangerScript.FadeToScene("BeachSeriesScene");
+    }
+
+    public void PlayLevel15()
+    {
+        LevelManager.SetLevelNumber(15);
+        levelChangerScript.FadeToScene("BeachSeriesScene");
     }
 }

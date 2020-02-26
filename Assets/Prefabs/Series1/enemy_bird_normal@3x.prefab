@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2897012486560043347}
   - component: {fileID: 7926714568705279581}
   - component: {fileID: 2100354624846228825}
+  - component: {fileID: 1322917871709279018}
+  - component: {fileID: 3391738663562368800}
   m_Layer: 0
   m_Name: enemy_bird_normal@3x
   m_TagString: Obstacle
@@ -249,3 +251,33 @@ PolygonCollider2D:
       - {x: 0.16499999, y: -2.7649999}
       - {x: 0.315, y: -2.745}
       - {x: 0.375, y: -2.735}
+--- !u!114 &1322917871709279018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7083300218506906694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb928803ea2b54ca182162b850aa0f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _id: 0
+  disableColliders: 0
+  active: 0
+  cleanup: 0
+--- !u!114 &3391738663562368800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7083300218506906694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ce8aaa20492442e0ba90d598e740407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 2100354624846228825}
+  gameObstacleScript: {fileID: 1322917871709279018}

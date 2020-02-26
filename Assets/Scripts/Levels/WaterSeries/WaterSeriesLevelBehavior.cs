@@ -25,7 +25,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
     // NOTE: Common level attributes
     public GameObject gameCamera;
     public GameObject background;
-    public GameObject finishLinePrefab;
 
     private int collectibleGenerationCounter = collectibleGenerationTurns;
     private const int collectibleGenerationTurns = 37;
@@ -64,7 +63,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
 
     // Sprites for collectibles to show in the collectibles menu at the top
     // of the screen
-    public GameObject eggPrefab;
     private int item1Count;
     private int item2Count;
     private int item3Count;
@@ -143,6 +141,17 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
 
         Physics2D.IgnoreLayerCollision(8, 9);
 
+        if (Screen.width > Screen.height)
+        {
+            // Calculate the offscreen startpoint when the screen is wider than it is tall
+            cameraMaxX = (Camera.main.orthographicSize * 2.0f) * (Screen.width / Screen.height);
+        }
+        else if (Screen.height > Screen.width)
+        {
+            // Calculate the offscreen startpoint when the screen is taller than it is wide (phones or portrait iPad)
+            cameraMaxX = (Camera.main.orthographicSize);
+        }
+
         commonObject = Instantiate(commonPrefab);
         commonScript = commonObject.GetComponent<CommonBehavior>();
 
@@ -166,6 +175,21 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
             "FinishLine"
         };
         commonScript.AddTriggerCollisionTags(triggerTags);
+
+        // Camera orientation and off-screen item start calculation is now done
+        // after the user presses the Start button
+
+        ground1Renderer = groundObject1.GetComponent<Renderer>();
+        ground2Renderer = groundObject2.GetComponent<Renderer>();
+        groundObjectsDistance = groundObject2.transform.localPosition.x - groundObject1.transform.localPosition.x;
+
+        Renderer backgroundRenderer = background.GetComponent<Renderer>();
+        // This minimum value is the minimum Y value at which objects should be generated
+        backgroundMinY = backgroundRenderer.bounds.min.y + backgroundRenderer.bounds.size.y * 0.12f;
+        backgroundMaxY = backgroundRenderer.bounds.max.y * 0.95f;
+        groundMaxY = groundObject1.transform.position.y + ground1Renderer.bounds.size.y;
+
+        gameItemObjectScript.InitGameObjectManager(cameraMaxX, backgroundMinY, backgroundMaxY, NUM_OBSTACLES, NUM_COLLECTIBLES);
 
         // Switch level prep based on level number
         int levelNumber = LevelManager.GetCurrentLevel();
@@ -192,19 +216,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
                 break;
         }
 
-        // Camera orientation and off-screen item start calculation is now done
-        // after the user presses the Start button
-
-        ground1Renderer = groundObject1.GetComponent<Renderer>();
-        ground2Renderer = groundObject2.GetComponent<Renderer>();
-        groundObjectsDistance = groundObject2.transform.localPosition.x - groundObject1.transform.localPosition.x;
-
-        Renderer backgroundRenderer = background.GetComponent<Renderer>();
-        // This minimum value is the minimum Y value at which objects should be generated
-        backgroundMinY = backgroundRenderer.bounds.min.y + backgroundRenderer.bounds.size.y * 0.12f;
-        backgroundMaxY = backgroundRenderer.bounds.max.y * 0.95f;
-        groundMaxY = groundObject1.transform.position.y + ground1Renderer.bounds.size.y;
-
         // XXX Seed this with the level number!!!
         // Seed the random number generator here first
         Random.InitState(levelNumber);
@@ -215,7 +226,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         // 3. Items that need to be removed
         StartCoroutine(CheckCollisions());
         StartCoroutine(CheckItemsCollected());
-        // XXX REMOVE ME StartCoroutine(CheckItemsForRemoval());
     }
 
     #region EnumeratorFunctions
@@ -231,20 +241,12 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
                     // Disable collisions; they will be update when object positions are updated
                     collidersWereDisabled = true;
                     gameItemObjectScript.DisableColliders();
-                    if (generatedShark && false == sharkDone)
-                    {
-                        shark.gameObject.GetComponent<PolygonCollider2D>().enabled = false;
-                    }
                 }
                 else if (false == commonScript.disableColliders && collidersWereDisabled)
                 {
                     // Enable collisions; they will be updated when object positions are updated
                     collidersWereDisabled = false;
                     gameItemObjectScript.EnableColliders();
-                    if (generatedShark && false == sharkDone)
-                    {
-                        shark.gameObject.GetComponent<PolygonCollider2D>().enabled = true;
-                    }
                 }
             }
 
@@ -296,45 +298,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
             yield return new WaitForSeconds(0.1f);
         }
     }
-
-    /* XXX REMOVE ME
-    IEnumerator CheckItemsForRemoval()
-    {
-        for (; ; )
-        {
-            for (int i = 0; i < gameObstacles.Length; ++i)
-            {
-                if (gameObstacles[i].used)
-                {
-                    Renderer r = gameObstacles[i].renderer;
-                    if (r.bounds.max.x < (-1 * cameraMaxX))
-                    {
-                        GameObject obj = gameObstacles[i].gameObject;
-                        gameItemObjectScript.RemoveObstacleFromGame(obj);
-                        // XXX REMOVE ME gameItemObjectScript.RemoveObjectFromGame(gameObstacles, obj);
-                    }
-                }
-            }
-
-            for (int i = 0; i < gameCollectibles.Length; ++i)
-            {
-                if (gameCollectibles[i].used)
-                {
-                    Renderer r = gameCollectibles[i].renderer;
-                    if (r.bounds.max.x < (-1 * cameraMaxX))
-                    {
-                        GameObject obj = gameCollectibles[i].gameObject;
-                        gameItemObjectScript.RemoveCollectibleFromGame(obj);
-                        // XXX REMOVE ME gameItemObjectScript.RemoveObjectFromGame(gameCollectibles, obj);
-                    }
-                }
-            }
-
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
-    */
-
     #endregion
 
     // Update is called once per frame
@@ -343,28 +306,13 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         switch (commonScript.GetGameState())
         {
             case CommonBehavior.GameState.Active:
-                if (0f == cameraMaxX)
+                if (false == gameItemObjectScript.active)
                 {
-                    // Figure out the best place to start generating pipes off screen
-                    // It should be shortly off camera on the right side before becoming visible in the camera
-                    if (Screen.width > Screen.height)
-                    {
-                        // Calculate the offscreen startpoint when the screen is wider than it is tall
-                        cameraMaxX = (Camera.main.orthographicSize * 2.0f) * (Screen.width / Screen.height);
-                    }
-                    else if (Screen.height > Screen.width)
-                    {
-                        // Calculate the offscreen startpoint when the screen is taller than it is wide (phones or portrait iPad)
-                        cameraMaxX = (Camera.main.orthographicSize);
-                    }
-
-                    gameItemObjectScript.InitGameObjectManager(cameraMaxX, backgroundMinY, backgroundMaxY, NUM_OBSTACLES, NUM_COLLECTIBLES);
+                    gameItemObjectScript.StartGame();
                 }
 
                 // Update object positions in the game
                 // XXX UpdateCloudObjects();
-                gameItemObjectScript.UpdateGameObstaclePositions();
-                gameItemObjectScript.UpdateGameCollectiblePositions();
                 UpdateGroundObjects();
 
                 // Update the level timer to know when to end the level
@@ -379,55 +327,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
                 else if (levelTimer >= timeForEggGeneration && generateEggItem && false == eggHasBeenGenerated)
                 {
                     timeToGenerateEgg = true;
-                }
-
-                if (LevelManager.GetCurrentLevel() == 10)
-                {
-                    // Generate the shark if it's time
-                    if (levelTimer >= sharkGenerateTime && false == generatedShark)
-                    {
-                        shark = Instantiate(sharkPrefab);
-                        Renderer _rend = shark.GetComponent<Renderer>();
-                        float objWidth = _rend.bounds.size.x / 2;
-                        Vector3 pos = shark.transform.localPosition;
-                        pos.x = cameraMaxX + objWidth;
-                        shark.transform.localPosition = pos;
-
-                        // Rotate the shark 
-                        shark.transform.rotation = new Quaternion(0, 0, -0.35f, 1.0f);
-
-                        sharkGoingUp = true;
-                        generatedShark = true;
-                    }
-
-                    // Move the shark if it's been generated
-                    if (generatedShark && false == sharkDone)
-                    {
-                        Vector3 pos = shark.transform.localPosition;
-                        pos.x -= SHARK_X_DELTA;
-                        if (sharkGoingUp)
-                        {
-                            pos.y += SHARK_Y_DELTA;
-                            if (pos.y >= SHARK_MAX_HEIGHT)
-                            {
-                                sharkGoingUp = false;
-                            }
-                        }
-                        else
-                        {
-                            pos.y -= SHARK_Y_DELTA;
-                        }
-                        shark.transform.localPosition = pos;
-
-                        Renderer _rend = shark.GetComponent<Renderer>();
-                        float maxX = _rend.bounds.max.x;
-                        if (maxX < -cameraMaxX)
-                        {
-                            // Remove the shark from the game
-                            Destroy(shark);
-                            sharkDone = true;
-                        }
-                    }
                 }
 
                 if ((levelTimer / levelTimeLength >= progress25) && false == showedProgress25)
@@ -461,14 +360,26 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
                 break;
 
             case CommonBehavior.GameState.Loss:
+                if (gameItemObjectScript.active)
+                {
+                    gameItemObjectScript.StopGame();
+                }
                 GameOver();
                 break;
 
             case CommonBehavior.GameState.Win:
+                if (gameItemObjectScript.active)
+                {
+                    gameItemObjectScript.StopGame();
+                }
                 GameOver(success: true);
                 break;
 
             case CommonBehavior.GameState.Wait:
+                if (gameItemObjectScript.active)
+                {
+                    gameItemObjectScript.StopGame();
+                }
                 // Don't do anything
                 break;
 
@@ -476,11 +387,14 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
                 // Keep objects moving after user wins
                 if (userWon)
                 {
+                    if (false == gameItemObjectScript.active)
+                    {
+                        gameItemObjectScript.StartGame();
+                    }
+
                     // Ensure all items continue moving after game is over
                     // It looks better than everything just stopping
                     // XXX UpdateCloudObjects();
-                    gameItemObjectScript.UpdateGameObstaclePositions();
-                    gameItemObjectScript.UpdateGameCollectiblePositions();
                     UpdateGroundObjects();
                 }
                 break;
@@ -645,7 +559,7 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
                         commonScript.UpdateHighScore(levelData.levelData.level10HighScore);
                     }
 
-                    // Can't have a "next" level unlocked because there are only 5 levels
+                    nextLevelUnlocked = true;
 
                     break;
             }
@@ -658,23 +572,23 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
             int levelNumber = LevelManager.GetCurrentLevel();
             switch (levelNumber)
             {
-                case 1:
+                case 6:
                     commonScript.UpdateHighScore(levelData.levelData.level6HighScore);
                     break;
 
-                case 2:
+                case 7:
                     commonScript.UpdateHighScore(levelData.levelData.level7HighScore);
                     break;
 
-                case 3:
+                case 8:
                     commonScript.UpdateHighScore(levelData.levelData.level8HighScore);
                     break;
 
-                case 4:
+                case 9:
                     commonScript.UpdateHighScore(levelData.levelData.level9HighScore);
                     break;
 
-                case 5:
+                case 10:
                     commonScript.UpdateHighScore(levelData.levelData.level10HighScore);
                     break;
             }
@@ -718,123 +632,304 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
 
     private void Level6Prep()
     {
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.0f;
+        float enemyBirdMaxChance = 1.0f;
 
-        gameItemObjectScript.AddEnemyBirdObstacle(-1, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.0f, 1.0f);
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
 
+
+        // Setup the display at the top to show collectible items for the level
         commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
-        gameItemObjectScript.AddBananaCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                  0.0f, 0.19f);
-        gameItemObjectScript.AddCoinCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                0.20f, 1.0f);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.19f;
+
+        float coinMinChance = 0.20f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                backgroundMinY, backgroundMaxY);
     }
 
     private void Level7Prep()
     {
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.11f;
+        float enemyBirdMaxChance = 1.0f;
 
         float waveMinSpeed = 0.07f;
         float waveMaxSpeed = 0.08f;
+        float waveMinChance = 0.00f;
+        float waveMaxChance = 0.10f;
+        float waveMinGenY = -7f;
+        float waveMaxGenY = -5.5f;
 
-        gameItemObjectScript.AddWaveObstacle(1, waveMinSpeed, waveMaxSpeed, 0.00f, 0.10f);
-        gameItemObjectScript.AddEnemyBirdObstacle(-1, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.11f, 1.0f);
+        gameItemObjectScript.AddWaveObstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, waveMinSpeed, waveMaxSpeed,
+                                             waveMinChance, waveMaxChance, waveMinGenY, waveMaxGenY, 0, 0);
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
 
+
+        // Setup the display at the top to show collectible items for the level
         commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
-        gameItemObjectScript.AddBananaCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                  0.0f, 0.19f);
-        gameItemObjectScript.AddCoinCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                0.20f, 1.0f);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.19f;
+
+        float coinMinChance = 0.20f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                backgroundMinY, backgroundMaxY);
     }
 
     private void Level8Prep()
     {
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.21f;
+        float enemyBirdMaxChance = 1.0f;
 
         float waveMinSpeed = 0.07f;
         float waveMaxSpeed = 0.08f;
+        float waveMinChance = 0.00f;
+        float waveMaxChance = 0.10f;
+        float waveMinGenY = -7f;
+        float waveMaxGenY = -5.5f;
 
         float fish1MinSpeed = 0.055f;
         float fish1MaxSpeed = 0.058f;
+        float fish1MinChance = 0.11f;
+        float fish1MaxChance = 0.15f;
+        float fish1MinGenY = -7f;
+        float fish1MaxGenY = -7f;
+        float fish1MinMoveY = -4f;
+        float fish1MaxMoveY = -2f;
 
-        gameItemObjectScript.AddWaveObstacle(1, waveMinSpeed, waveMaxSpeed, 0.00f, 0.10f);
-        gameItemObjectScript.AddFish1Obstacle(1, fish1MinSpeed, fish1MaxSpeed, 0.11f, 0.15f);
-        gameItemObjectScript.AddFish3Obstacle(1, fish1MinSpeed, fish1MaxSpeed, 0.16f, 0.20f);
-        gameItemObjectScript.AddEnemyBirdObstacle(-1, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.21f, 1.0f);
+        float fish3MinSpeed = 0.058f;
+        float fish3MaxSpeed = 0.061f;
+        float fish3MinChance = 0.16f;
+        float fish3MaxChance = 0.20f;
+        float fish3MinGenY = -7f;
+        float fish3MaxGenY = -7f;
+        float fish3MinMoveY = -3.5f;
+        float fish3MaxMoveY = -1.5f;
 
+        gameItemObjectScript.AddWaveObstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, waveMinSpeed, waveMaxSpeed,
+                                             waveMinChance, waveMaxChance, waveMinGenY, waveMaxGenY, 0, 0);
+        gameItemObjectScript.AddFish1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish1MinSpeed, fish1MaxSpeed,
+                                              fish1MinChance, fish1MaxChance, fish1MinGenY, fish1MaxGenY,
+                                              fish1MinMoveY, fish1MaxMoveY);
+        gameItemObjectScript.AddFish3Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish3MinSpeed, fish3MaxSpeed,
+                                              fish3MinChance, fish3MaxChance, fish3MinGenY, fish3MaxGenY,
+                                              fish3MinMoveY, fish3MaxMoveY);
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
+
+
+        // Setup the display at the top to show collectible items for the level
         commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(2, gameItemObjectScript.blueberriesPrefab.GetComponent<SpriteRenderer>().sprite);
-        gameItemObjectScript.AddBananaCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                  0.0f, 0.20f);
-        gameItemObjectScript.AddBlueberryCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                     0.21f, 0.30f);
-        gameItemObjectScript.AddCoinCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                0.31f, 1.0f);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.20f;
+
+        float blueberryMinChance = 0.21f;
+        float blueberryMaxChance = 0.30f;
+
+        float coinMinChance = 0.31f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                     GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
+                                                     backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                backgroundMinY, backgroundMaxY);
     }
 
     private void Level9Prep()
     {
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.26f;
+        float enemyBirdMaxChance = 1.0f;
 
         float waveMinSpeed = 0.07f;
         float waveMaxSpeed = 0.08f;
+        float waveMinChance = 0.00f;
+        float waveMaxChance = 0.10f;
+        float waveMinGenY = -7f;
+        float waveMaxGenY = -5.5f;
 
         float fish1MinSpeed = 0.055f;
         float fish1MaxSpeed = 0.058f;
+        float fish1MinChance = 0.11f;
+        float fish1MaxChance = 0.15f;
+        float fish1MinGenY = -7f;
+        float fish1MaxGenY = -7f;
+        float fish1MinMoveY = -4f;
+        float fish1MaxMoveY = -2f;
 
-        float fish2MinSpeed = 0.060f;
-        float fish2MaxSpeed = 0.065f;
+        float fish3MinSpeed = 0.058f;
+        float fish3MaxSpeed = 0.061f;
+        float fish3MinChance = 0.16f;
+        float fish3MaxChance = 0.20f;
+        float fish3MinGenY = -7f;
+        float fish3MaxGenY = -7f;
+        float fish3MinMoveY = -3.5f;
+        float fish3MaxMoveY = -1.5f;
 
-        float boatMinSpeed = 0.06f;
-        float boatMaxSpeed = 0.07f;
+        float boat1MinSpeed = 0.06f;
+        float boat1MaxSpeed = 0.07f;
+        float boat1MinChance = 0.21f;
+        float boat1MaxChance = 0.25f;
+        float boat1MinGenY = -4f;
+        float boat1MaxGenY = -4f;
+        float boat1MinMoveY = -4f;
+        float boat1MaxMoveY = -4f;
 
-        gameItemObjectScript.AddWaveObstacle(1, waveMinSpeed, waveMaxSpeed, 0.00f, 0.10f);
-        gameItemObjectScript.AddFish1Obstacle(1, fish1MinSpeed, fish1MaxSpeed, 0.11f, 0.15f);
-        gameItemObjectScript.AddFish2Obstacle(1, fish2MinSpeed, fish2MaxSpeed, 0.16f, 0.20f);
-        gameItemObjectScript.AddFish3Obstacle(1, fish1MinSpeed, fish1MaxSpeed, 0.21f, 0.25f);
-        gameItemObjectScript.AddBoat1Obstacle(1, boatMinSpeed, boatMaxSpeed, 0.26f, 0.30f);
-        gameItemObjectScript.AddEnemyBirdObstacle(-1, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.31f, 1.0f);
+        gameItemObjectScript.AddWaveObstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, waveMinSpeed, waveMaxSpeed,
+                                             waveMinChance, waveMaxChance, waveMinGenY, waveMaxGenY, 0, 0);
+        gameItemObjectScript.AddFish1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish1MinSpeed, fish1MaxSpeed,
+                                              fish1MinChance, fish1MaxChance, fish1MinGenY, fish1MaxGenY,
+                                              fish1MinMoveY, fish1MaxMoveY);
+        gameItemObjectScript.AddFish3Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish3MinSpeed, fish3MaxSpeed,
+                                              fish3MinChance, fish3MaxChance, fish3MinGenY, fish3MaxGenY,
+                                              fish3MinMoveY, fish3MaxMoveY);
+        gameItemObjectScript.AddBoat1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, boat1MinSpeed, boat1MaxSpeed,
+                                              boat1MinChance, boat1MaxChance, boat1MinGenY, boat1MaxGenY,
+                                              boat1MinMoveY, boat1MaxMoveY);
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
 
+
+        // Setup the display at the top to show collectible items for the level
         commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(2, gameItemObjectScript.blueberriesPrefab.GetComponent<SpriteRenderer>().sprite);
-        gameItemObjectScript.AddBananaCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                          0.0f, 0.20f);
-        gameItemObjectScript.AddBlueberryCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                     0.21f, 0.30f);
-        gameItemObjectScript.AddCoinCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                0.31f, 1.0f);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.20f;
+
+        float blueberryMinChance = 0.21f;
+        float blueberryMaxChance = 0.30f;
+
+        float coinMinChance = 0.31f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                     GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
+                                                     backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                backgroundMinY, backgroundMaxY);
     }
 
     private void Level10Prep()
     {
+        // Add obstacles to the level
+        float sharkMinSpeed = 0.08f;
+        float sharkMaxSpeed = 0.10f;
+        float sharkMinChance = 0.26f;
+        float sharkMaxChance = 0.27f;
+        float sharkMinGenY = -18f;
+        float sharkMaxGenY = -18f;
+        float sharkMinMoveY = -7.5f;
+        float sharkMaxMoveY = -7.5f;
+
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.28f;
+        float enemyBirdMaxChance = 1.0f;
 
         float waveMinSpeed = 0.07f;
         float waveMaxSpeed = 0.08f;
+        float waveMinChance = 0.00f;
+        float waveMaxChance = 0.10f;
+        float waveMinGenY = -7f;
+        float waveMaxGenY = -5.5f;
 
         float fish1MinSpeed = 0.055f;
         float fish1MaxSpeed = 0.058f;
+        float fish1MinChance = 0.11f;
+        float fish1MaxChance = 0.15f;
+        float fish1MinGenY = -7f;
+        float fish1MaxGenY = -7f;
+        float fish1MinMoveY = -4f;
+        float fish1MaxMoveY = -2f;
 
-        float fish2MinSpeed = 0.060f;
-        float fish2MaxSpeed = 0.065f;
+        float fish3MinSpeed = 0.058f;
+        float fish3MaxSpeed = 0.061f;
+        float fish3MinChance = 0.16f;
+        float fish3MaxChance = 0.20f;
+        float fish3MinGenY = -7f;
+        float fish3MaxGenY = -7f;
+        float fish3MinMoveY = -3.5f;
+        float fish3MaxMoveY = -1.5f;
 
-        float boatMinSpeed = 0.06f;
-        float boatMaxSpeed = 0.07f;
+        float boat1MinSpeed = 0.06f;
+        float boat1MaxSpeed = 0.07f;
+        float boat1MinChance = 0.21f;
+        float boat1MaxChance = 0.25f;
+        float boat1MinGenY = -4f;
+        float boat1MaxGenY = -4f;
+        float boat1MinMoveY = -4f;
+        float boat1MaxMoveY = -4f;
 
-        gameItemObjectScript.AddWaveObstacle(1, waveMinSpeed, waveMaxSpeed, 0.00f, 0.10f);
-        gameItemObjectScript.AddFish1Obstacle(1, fish1MinSpeed, fish1MaxSpeed, 0.11f, 0.15f);
-        gameItemObjectScript.AddFish2Obstacle(1, fish2MinSpeed, fish2MaxSpeed, 0.16f, 0.20f);
-        gameItemObjectScript.AddFish3Obstacle(1, fish1MinSpeed, fish1MaxSpeed, 0.21f, 0.25f);
-        gameItemObjectScript.AddBoat1Obstacle(1, boatMinSpeed, boatMaxSpeed, 0.26f, 0.30f);
-        gameItemObjectScript.AddEnemyBirdObstacle(-1, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.31f, 1.0f);
+        gameItemObjectScript.AddShark1Obstacle(1, 2, sharkMinSpeed, sharkMaxSpeed, sharkMinChance, sharkMaxChance,
+                                               sharkMinGenY, sharkMaxGenY, sharkMinMoveY, sharkMaxMoveY);
+        gameItemObjectScript.AddWaveObstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, waveMinSpeed, waveMaxSpeed,
+                                             waveMinChance, waveMaxChance, waveMinGenY, waveMaxGenY, 0, 0);
+        gameItemObjectScript.AddFish1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish1MinSpeed, fish1MaxSpeed,
+                                              fish1MinChance, fish1MaxChance, fish1MinGenY, fish1MaxGenY,
+                                              fish1MinMoveY, fish1MaxMoveY);
+        gameItemObjectScript.AddFish3Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish3MinSpeed, fish3MaxSpeed,
+                                              fish3MinChance, fish3MaxChance, fish3MinGenY, fish3MaxGenY,
+                                              fish3MinMoveY, fish3MaxMoveY);
+        gameItemObjectScript.AddBoat1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, boat1MinSpeed, boat1MaxSpeed,
+                                              boat1MinChance, boat1MaxChance, boat1MinGenY, boat1MaxGenY,
+                                              boat1MinMoveY, boat1MaxMoveY);
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
 
         if (false == inventoryData.IsBirdInInventory(InventoryData.NIGEL_ID))
         {
@@ -850,13 +945,30 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(2, gameItemObjectScript.blueberriesPrefab.GetComponent<SpriteRenderer>().sprite);
         commonScript.InitItemCanvasImage(3, gameItemObjectScript.strawberryPrefab.GetComponent<SpriteRenderer>().sprite);
-        gameItemObjectScript.AddBananaCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                          0.0f, 0.20f);
-        gameItemObjectScript.AddBlueberryCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                     0.21f, 0.30f);
-        gameItemObjectScript.AddStrawberryCollectible(1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                      0.31f, 0.34f);
-        gameItemObjectScript.AddCoinCollectible(-1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                0.35f, 1.0f);
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.20f;
+
+        float blueberryMinChance = 0.21f;
+        float blueberryMaxChance = 0.30f;
+
+        float strawberryMinChance = 0.31f;
+        float strawberryMaxChance = 0.34f;
+
+        float coinMinChance = 0.35f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                     GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
+                                                     backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddStrawberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, 1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
+                                                      strawberryMinChance, strawberryMaxChance, backgroundMinY, backgroundMaxY);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                backgroundMinY, backgroundMaxY);
     }
 }

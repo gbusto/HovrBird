@@ -1498,7 +1498,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6408940546990850821}
   m_HandleRect: {fileID: 8296981346095164926}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2762,7 +2762,7 @@ MonoBehaviour:
   kokoSprite: {fileID: 21300000, guid: 216ab2d0fb2be4880a81919999f2b5bb, type: 3}
   samSprite: {fileID: 21300000, guid: d027081e750904c4e958bacd1495002a, type: 3}
   nigelSprite: {fileID: 21300000, guid: 2a5c4f1e220f942eeab409caf19765db, type: 3}
-  stevenSprite: {fileID: 0}
+  stevenSprite: {fileID: 21300000, guid: 03846d974ebd144fcad9f9a529b86d95, type: 3}
   notificationCanvasPrefab: {fileID: 7118869547811108243, guid: f89053a661e984794ac2ad8e2681121e,
     type: 3}
 --- !u!328 &1931688170982614016

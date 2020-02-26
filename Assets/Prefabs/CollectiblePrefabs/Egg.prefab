@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 683287088587212409}
   - component: {fileID: 8925416904212276584}
   - component: {fileID: 6889752458783784934}
+  - component: {fileID: 2451497895341652104}
+  - component: {fileID: 6619476768594417511}
   m_Layer: 0
   m_Name: Egg
   m_TagString: Collectible
@@ -88,7 +90,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7112239688589263297}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
@@ -136,3 +138,33 @@ PolygonCollider2D:
       - {x: 0.22999999, y: -1.185}
       - {x: 0.42999998, y: -1.0649999}
       - {x: 0.59, y: -0.895}
+--- !u!114 &2451497895341652104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112239688589263297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb928803ea2b54ca182162b850aa0f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _id: 0
+  disableColliders: 0
+  active: 0
+  cleanup: 0
+--- !u!114 &6619476768594417511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7112239688589263297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f64a3415ee1341b393548a4789e6882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 6889752458783784934}
+  gameObstacleScript: {fileID: 2451497895341652104}

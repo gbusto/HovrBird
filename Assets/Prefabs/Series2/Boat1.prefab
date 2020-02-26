@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 8256022690172884410}
   - component: {fileID: 5103890008202423788}
   - component: {fileID: 6282106494546961864}
+  - component: {fileID: 7262156164502975968}
+  - component: {fileID: 7787309071624425074}
   m_Layer: 0
   m_Name: Boat1
   m_TagString: Obstacle
@@ -88,7 +90,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4737717139797727871}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -180,3 +182,33 @@ PolygonCollider2D:
       - {x: -1.1, y: -2.055}
       - {x: -0.93, y: -2.065}
       - {x: 0.94, y: -2.065}
+--- !u!114 &7262156164502975968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4737717139797727871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb928803ea2b54ca182162b850aa0f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _id: 0
+  disableColliders: 0
+  active: 0
+  cleanup: 0
+--- !u!114 &7787309071624425074
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4737717139797727871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dabd44e60a33e41dc95a4193622f7826, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 6282106494546961864}
+  gameObstacleScript: {fileID: 7262156164502975968}

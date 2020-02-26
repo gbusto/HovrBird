@@ -77,6 +77,22 @@ MonoBehaviour:
     type: 3}
   boat2Prefab: {fileID: 7164699375132172394, guid: 91bb5cf3460da4873ad6f1d0a704ae9b,
     type: 3}
+  shark1Prefab: {fileID: 1300790099234518119, guid: a4d0ebcd34eca463aa48b6c41f3d73ab,
+    type: 3}
+  beachBallPrefab: {fileID: 6927716947919993910, guid: d4d35e30e9b514bb4bec1c42f521b34f,
+    type: 3}
+  footballPrefab: {fileID: 6970937766930867525, guid: 7a205306c0ee34452ba4709ae212a431,
+    type: 3}
+  palmTreePrefab: {fileID: 7368405791046050670, guid: 2369daaab191f4e79a14b02d65642f6b,
+    type: 3}
+  propPlanePrefab: {fileID: 4269927180928665668, guid: a1d7e016912b94cd2aaa6504ec6e62f9,
+    type: 3}
+  stormCloud1: {fileID: 4832002423441760262, guid: c65053bc77c2a4b71a2cecc76b1d458d,
+    type: 3}
+  stormCloud2: {fileID: 4075957602044457100, guid: f678be209a2cf4eeea387f44c5cff84d,
+    type: 3}
+  eggPrefab: {fileID: 7112239688589263297, guid: 67f84401fa17f48a0b8b53c629acb859,
+    type: 3}
   finishLinePrefab: {fileID: 6414285918293242451, guid: 9e3996423cb824376b6ef494c9f12128,
     type: 3}
   coinPrefab: {fileID: 747649907371809633, guid: ac5f88e50b6274740adc8c403d66707f,

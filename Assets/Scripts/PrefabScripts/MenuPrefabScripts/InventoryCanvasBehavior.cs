@@ -190,7 +190,7 @@ public class InventoryCanvasBehavior : MonoBehaviour
                 return nigelSprite;
 
             case InventoryData.STEVEN_ID:
-                return samSprite;
+                return stevenSprite;
         }
 
         return null;

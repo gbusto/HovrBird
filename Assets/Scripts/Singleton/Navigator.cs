@@ -9,6 +9,7 @@ public class Navigator
     
     public const string LEVEL_SERIES1_SCENE = "Level1Scene";
     public const string LEVEL_SERIES2_SCENE = "WaterSeriesScene";
+    public const string LEVEL_SERIES3_SCENE = "BeachSeriesScene";
 
     private static readonly string[] level_scenes =
     {
@@ -72,6 +73,11 @@ public class Navigator
         if (levelNumber >= 6 && levelNumber <= 10)
         {
             return LEVEL_SERIES2_SCENE;
+        }
+
+        if (levelNumber >= 11 && levelNumber <= 15)
+        {
+            return LEVEL_SERIES3_SCENE;
         }
 
         return GAME_MENU_SCENE;

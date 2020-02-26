@@ -254,8 +254,6 @@ MonoBehaviour:
   gameItemObject: {fileID: 211655255}
   gameCamera: {fileID: 1964723860}
   background: {fileID: 1271674832}
-  finishLinePrefab: {fileID: 6414285918293242451, guid: 9e3996423cb824376b6ef494c9f12128,
-    type: 3}
   cloud1Prefab: {fileID: 7240760411846588062, guid: 58228bb7a29bd4862814c5cc3a683bf6,
     type: 3}
   cloud2Prefab: {fileID: 232462000872733235, guid: 7602f2d299dae47b1af8c85958235aae,
@@ -268,8 +266,6 @@ MonoBehaviour:
     type: 3}
   groundObject1: {fileID: 1710887433}
   groundObject2: {fileID: 1253326595}
-  eggPrefab: {fileID: 7112239688589263297, guid: 67f84401fa17f48a0b8b53c629acb859,
-    type: 3}
 --- !u!1 &1253326595
 GameObject:
   m_ObjectHideFlags: 0
