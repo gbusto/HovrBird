@@ -135,6 +135,10 @@ public class BirdPanelBehavior : MonoBehaviour
         birdButton.onClick.AddListener(FlyButtonClicked);
 
         eggHatchingDisplay.gameObject.SetActive(false);
+
+        // Rerun egg hatch checks on the other bird panels after spending currency
+        // to hatch this egg
+        parentObject.SendMessage("RunHatchChecks", birdId);
     }
 
     public void InitBirdPanel(uint birdId, Sprite birdSprite, string name,
@@ -218,7 +222,7 @@ public class BirdPanelBehavior : MonoBehaviour
         return birdId;
     }
 
-    private void RunInventoryCheck()
+    public void RunInventoryCheck()
     {
         if (inventoryData.HasEggHatched(birdId))
         {
@@ -247,6 +251,8 @@ public class BirdPanelBehavior : MonoBehaviour
 
         // Show the requirements canvas
         birdReqsCanvas.gameObject.SetActive(true);
+        birdButton.onClick.RemoveAllListeners();
+        birdButton.gameObject.SetActive(false);
     }
 
     private void ConfigPanelUnlockedEgg()

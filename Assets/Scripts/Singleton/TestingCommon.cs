@@ -40,10 +40,10 @@ public static class TestingCommon
 
         Dictionary<string, int> currencyDict = new Dictionary<string, int>
         {
-            [InventoryData.coinKey] = 1000,
-            [InventoryData.bananaKey] = 1000,
-            [InventoryData.blueberryKey] = 1000,
-            [InventoryData.strawberryKey] = 1000
+            [InventoryData.coinKey] = 150,
+            [InventoryData.bananaKey] = 60,
+            [InventoryData.blueberryKey] = 20,
+            [InventoryData.strawberryKey] = 1
         };
         data.AddCurrency(currencyDict);
 

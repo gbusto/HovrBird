@@ -45,6 +45,8 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
     private NotificationManager notificationMgr;
 
+    private BirdPanelBehavior[] birdPanelScripts;
+
     // XXX The code in this function should really be called in Start()
     // but that doesn't get called until the script gets attached and the
     // object is activated for the first time
@@ -69,6 +71,8 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
         notificationMgr.Subscribe(NotificationManager.newEggNotificationId, birdsNotification);
         notificationMgr.Subscribe(NotificationManager.canHatchNotificationId, birdsNotification);
+
+        birdPanelScripts = new BirdPanelBehavior[InventoryData.BIRDS.Length];
     }
 
     private void OnEnable()
@@ -98,6 +102,7 @@ public class InventoryCanvasBehavior : MonoBehaviour
                 birdPanel.transform.SetParent(birdScrollViewContent, false);
                 BirdPanelBehavior birdPanelScript = birdPanel.GetComponent<BirdPanelBehavior>();
                 birdPanelScript.InitBirdPanel(birdId, sprite, birdName, reqsSpriteList, reqDict, gameObject);
+                birdPanelScripts[i] = birdPanelScript;
 
                 // Properly position the bird panel
                 Vector3 pos = birdPanel.transform.localPosition;
@@ -123,6 +128,8 @@ public class InventoryCanvasBehavior : MonoBehaviour
 
     public void SwitchActiveBird(GameObject birdPanel)
     {
+        // XXX This can be improved using the birdPanelScripts array in this file now
+
         if (null == activeBirdPanel)
         {
             activeBirdPanel = birdPanel;
@@ -142,6 +149,17 @@ public class InventoryCanvasBehavior : MonoBehaviour
             activeBirdPanel.SendMessage("DeactivateBird");
 
             activeBirdPanel = birdPanel;
+        }
+    }
+
+    public void RunHatchChecks(uint birdId)
+    {
+        for (int i = 0; i < birdPanelScripts.Length; ++i)
+        {
+            if (birdPanelScripts[i].GetBirdId() != birdId)
+            {
+                birdPanelScripts[i].RunInventoryCheck();
+            }
         }
     }
 
