@@ -752,6 +752,8 @@ public class CommonBehavior : MonoBehaviour
     // Switches state from Wait to Active
     public void StartGame(bool impulse = false)
     {
+        Time.timeScale = 1f;
+
         state = GameState.Active;
 
         if (impulse)
@@ -785,6 +787,8 @@ public class CommonBehavior : MonoBehaviour
     // Switches state from Active to Wait
     public void StopGame()
     {
+        Time.timeScale = 0f;
+
         state = GameState.Wait;
         birdScript.DisableGravity();
 
@@ -897,6 +901,7 @@ public class CommonBehavior : MonoBehaviour
 
             totalAttempts += 1;
 
+            Time.timeScale = 1f;
             state = GameState.Win;
 
             birdScript.RemoveAllCollisionTags();
@@ -919,6 +924,7 @@ public class CommonBehavior : MonoBehaviour
 
                 totalAttempts += 1;
 
+                Time.timeScale = 1f;
                 state = GameState.Loss;
 
                 birdScript.RemoveAllCollisionTags();

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2100354624846228825}
   - component: {fileID: 1322917871709279018}
   - component: {fileID: 3391738663562368800}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: enemy_bird_normal@3x
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
