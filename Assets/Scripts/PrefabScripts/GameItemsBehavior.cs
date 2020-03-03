@@ -128,6 +128,9 @@ public class GameItemsBehavior : MonoBehaviour
     public const int ANY_AMOUNT_IN_LEVEL = -1;
     public const int ANY_AMOUNT_IN_SCENE = -1;
 
+    public const float COLLECTIBLE_MIN_Y = -4f;
+    public const float COLLECTIBLE_MAX_Y = 4f;
+
     private List<ObstacleCounter> obstacleCounts;
     private List<ObstaclePrefab> obstaclePrefabs;
 
@@ -160,8 +163,7 @@ public class GameItemsBehavior : MonoBehaviour
         finishLineId = 0x50,
         enemyBird1Id,
         blimp1Id,
-        blimd2Id,
-        blimp3Id,
+        blimp2Id,
         plane1Id,
         plane2Id,
         parachute1Id,
@@ -438,8 +440,8 @@ public class GameItemsBehavior : MonoBehaviour
             op._id = (int)ItemIds.eggId;
             op.startX = eggPrefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
             op.endX = op.startX * -1;
-            op.minGenY = -1f;
-            op.maxGenY = 1f;
+            op.minGenY = -2f;
+            op.maxGenY = 2f;
             op.minSpeed = BASE_SPEED;
             op.maxSpeed = BASE_SPEED;
 
@@ -547,6 +549,258 @@ public class GameItemsBehavior : MonoBehaviour
         op.maxNumInLevel = maxNumInLevel;
         op.directions = directions;
         op._id = (int)ItemIds.enemyBird1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddBlimp1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                  float maxSpeed, float minChance, float maxChance,
+                                  float minGenY, float maxGenY, float minMoveY,
+                                  float maxMoveY)
+    {
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = blimp1Prefab;
+        op.startX = blimp1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.blimp1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddBlimp2Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                  float maxSpeed, float minChance, float maxChance,
+                                  float minGenY, float maxGenY, float minMoveY,
+                                  float maxMoveY)
+    {
+
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = blimp2Prefab;
+        op.startX = blimp2Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.blimp2Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddParachute1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                      float maxSpeed, float minChance, float maxChance,
+                                      float minGenY, float maxGenY, float minMoveY,
+                                      float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = parachute1Prefab;
+        op.startX = parachute1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.parachute1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddParachute2Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                      float maxSpeed, float minChance, float maxChance,
+                                      float minGenY, float maxGenY, float minMoveY,
+                                      float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = parachute2Prefab;
+        op.startX = parachute2Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.parachute2Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddParachute3Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                      float maxSpeed, float minChance, float maxChance,
+                                      float minGenY, float maxGenY, float minMoveY,
+                                      float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = parachute3Prefab;
+        op.startX = parachute3Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.parachute3Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddPlane1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                  float maxSpeed, float minChance, float maxChance,
+                                  float minGenY, float maxGenY, float minMoveY,
+                                  float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = plane1Prefab;
+        op.startX = plane1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.plane1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddPlane2Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                  float maxSpeed, float minChance, float maxChance,
+                                  float minGenY, float maxGenY, float minMoveY,
+                                  float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = plane2Prefab;
+        op.startX = plane2Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.plane2Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddBalloon1Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                    float maxSpeed, float minChance, float maxChance,
+                                    float minGenY, float maxGenY, float minMoveY,
+                                    float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = balloon1Prefab;
+        op.startX = balloon1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.balloon1Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddBalloon2Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                    float maxSpeed, float minChance, float maxChance,
+                                    float minGenY, float maxGenY, float minMoveY,
+                                    float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = balloon2Prefab;
+        op.startX = balloon2Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.balloon2Id;
+
+        obstaclePrefabs.Add(op);
+        obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));
+    }
+
+    public void AddBalloon3Obstacle(int maxNumInScene, int maxNumInLevel, float minSpeed,
+                                    float maxSpeed, float minChance, float maxChance,
+                                    float minGenY, float maxGenY, float minMoveY,
+                                    float maxMoveY)
+    {
+        ObstaclePrefab op = new ObstaclePrefab();
+        op.prefab = balloon3Prefab;
+        op.startX = balloon3Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.endX = op.startX * -1;
+        op.minSpeed = minSpeed;
+        op.maxSpeed = maxSpeed;
+        op.minChance = minChance;
+        op.maxChance = maxChance;
+        op.maxGenY = maxGenY;
+        op.minGenY = minGenY;
+        op.maxMoveY = maxMoveY;
+        op.minMoveY = minMoveY;
+        op.maxNumInScene = maxNumInScene;
+        op.maxNumInLevel = maxNumInLevel;
+        op._id = (int)ItemIds.balloon3Id;
 
         obstaclePrefabs.Add(op);
         obstacleCounts.Add(new ObstacleCounter(op._id, 0, 0));

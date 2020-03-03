@@ -238,6 +238,81 @@ EdgeCollider2D:
   m_Points:
   - {x: -29, y: -16}
   - {x: 29, y: -16}
+--- !u!1001 &1339693892
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4784244532007848865, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_Name
+      value: GameItemsObject
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4784244532007848867, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b, type: 3}
+--- !u!1 &1339693893 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4784244532007848865, guid: 62798d99c1e7c4bb8a79b1ff620c2a3b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1339693892}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1573052313
 GameObject:
   m_ObjectHideFlags: 0
@@ -1125,6 +1200,8 @@ MonoBehaviour:
     type: 3}
   progressLinePrefab: {fileID: 7590961655731587626, guid: 76e5fb80d9f6e44ed9335e09554077ce,
     type: 3}
+  gameItemObject: {fileID: 1339693893}
+  gameItemObjectScript: {fileID: 0}
   gameCamera: {fileID: 1573052313}
   background: {fileID: 340884334}
   finishLinePrefab: {fileID: 6414285918293242451, guid: 9e3996423cb824376b6ef494c9f12128,

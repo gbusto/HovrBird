@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 2430986131741243965}
   - component: {fileID: 982453817656145068}
   - component: {fileID: -5905978718389752726}
+  - component: {fileID: 6599692857434873792}
+  - component: {fileID: 4549743796090844559}
   m_Layer: 0
   m_Name: parachute2@3x
   m_TagString: Obstacle
@@ -88,7 +90,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6937002489214690703}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -244,3 +246,33 @@ PolygonCollider2D:
       - {x: -0.12, y: -1.03}
       - {x: -0.089999996, y: -1.0799999}
       - {x: -0.08, y: -1.0799999}
+--- !u!114 &6599692857434873792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6937002489214690703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb928803ea2b54ca182162b850aa0f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _id: 0
+  disableColliders: 0
+  active: 0
+  cleanup: 0
+--- !u!114 &4549743796090844559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6937002489214690703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b55d6765b16ab46a8b92bc5f56e40036, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: -5905978718389752726}
+  gameObstacleScript: {fileID: 6599692857434873792}

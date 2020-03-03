@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 9100412672040539054}
   - component: {fileID: 6768263557196745717}
   - component: {fileID: 2652704789412290654}
+  - component: {fileID: 2695143900292335157}
+  - component: {fileID: 2912432673958795229}
   m_Layer: 0
   m_Name: blimp1@3x
   m_TagString: Obstacle
@@ -88,7 +90,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3626431465691020300}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -204,3 +206,33 @@ PolygonCollider2D:
       - {x: 0.79499996, y: -2.095}
       - {x: 0.865, y: -2.0249999}
       - {x: 0.895, y: -1.9549999}
+--- !u!114 &2695143900292335157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3626431465691020300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb928803ea2b54ca182162b850aa0f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _id: 0
+  disableColliders: 0
+  active: 0
+  cleanup: 0
+--- !u!114 &2912432673958795229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3626431465691020300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e3ed2d31c7244c8d8e03ac8e3b3f99f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collider: {fileID: 2652704789412290654}
+  gameObstacleScript: {fileID: 2695143900292335157}

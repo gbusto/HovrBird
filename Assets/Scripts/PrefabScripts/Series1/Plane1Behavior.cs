@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollectibleItemBehavior : MonoBehaviour
+public class Plane1Behavior : MonoBehaviour
 {
     public PolygonCollider2D collider;
     public GameObstacleBehavior gameObstacleScript;
@@ -20,14 +20,10 @@ public class CollectibleItemBehavior : MonoBehaviour
 
         xDelta = Random.Range(op.minSpeed, op.maxSpeed);
 
-        System.Random sysRandom = new System.Random();
-
         Vector3 pos = transform.localPosition;
         pos.x = op.startX;
-        pos.y = (float)(sysRandom.NextDouble() * (op.maxGenY - op.minGenY) + op.minGenY);
+        pos.y = Random.Range(op.minGenY, op.maxGenY);
         transform.localPosition = pos;
-
-        collider.enabled = true;
 
         init = true;
     }
@@ -42,6 +38,16 @@ public class CollectibleItemBehavior : MonoBehaviour
 
         if (gameObstacleScript.active)
         {
+            // Do whatever is needed to move the object
+            if (gameObstacleScript.disableColliders && collider.enabled)
+            {
+                collider.enabled = false;
+            }
+            else if (!gameObstacleScript.disableColliders && !collider.enabled)
+            {
+                collider.enabled = true;
+            }
+
             Vector3 pos = transform.localPosition;
             pos.x -= xDelta;
             transform.localPosition = pos;

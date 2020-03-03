@@ -32,6 +32,9 @@ public class Level1Behavior : MonoBehaviour
     private const float progress75 = 0.75f;
     private bool showedProgress75;
 
+    public GameObject gameItemObject;
+    private GameItemsBehavior gameItemObjectScript;
+
     public GameObject gameCamera;
     public GameObject background;
     public GameObject finishLinePrefab;
@@ -93,14 +96,10 @@ public class Level1Behavior : MonoBehaviour
     private int collectibleGenerationCounter;
     private static readonly int collectibleGenerationTurns = 37;
     // The previous index used for generating a collectible
-    private int prevCollectibleSlotIndex;
-    private int[] collectibleSlots;
 
     private int obstacleGenerationCounter = obstacleGenerationTurns;
     private static readonly int obstacleGenerationTurns = 14;
     // The previous index used for generating an obstacle
-    private int prevObstacleSlotIndex;
-    private int[] obstacleSlots;
 
     private static readonly float speed = 0.04f;
 
@@ -121,56 +120,28 @@ public class Level1Behavior : MonoBehaviour
     // The randomized time at which the egg should be generated
     private float timeForEggGeneration;
     private bool eggHasBeenGenerated;
-    private bool addEggToSlot;
+    private bool timeToGenerateEgg;
     private bool caughtEgg;
 
-    private bool strawberryWasGenerated;
+    private float minCollectibleHeight;
+    private float maxCollectibleHeight;
 
-    private LevelData levelData;
 
     List<(GameObject, float)> cloudPrefabs;
     List<(GameObject, Renderer)> cloudObjects;
 
     List<ObstaclePrefab> obstaclePrefabs;
 
-    private const int NUM_ITEMS = 15;
-    private GameObstacle[] gameObstacles = new GameObstacle[NUM_ITEMS];
-    // We will only use (n-1) of the (n) slots in this array for collectibles
-    // The (nth) slot is ONLY for the egg if the level is supposed to generate it
-    private GameObstacle[] gameCollectibles = new GameObstacle[7];
+    private const int NUM_OBSTACLES = 15;
+    private const int NUM_COLLECTIBLES = 7;
 
-    private static readonly int numberOfSlots = 9;
-    private Slot[] slots;
-
-    private readonly bool TEST_SLOTS;
-    private System.Random sysRandom;
-
-    GameObject[] collectiblePrefabArray;
-
+    private LevelData levelData;
     private InventoryData inventoryData;
 
     void Awake()
     {
-        // DO NOT SEED THIS RANDOM
-        sysRandom = new System.Random();
-
-        slots = new Slot[numberOfSlots];
-
-        // The slot numbers in which collectibles are generated
-        collectibleSlots = new int[]
-        {
-            2, 4, 6
-        };
-
-        obstacleSlots = new int[]
-        {
-            0, 1, 3, 5, 7, 8
-        };
-
         cloudPrefabs = new List<(GameObject, float)>();
         cloudObjects = new List<(GameObject, Renderer)>();
-
-        obstaclePrefabs = new List<ObstaclePrefab>();
 
         Screen.orientation = ScreenOrientation.Landscape;
         Screen.autorotateToLandscapeLeft = true;
@@ -179,7 +150,6 @@ public class Level1Behavior : MonoBehaviour
         Screen.autorotateToPortraitUpsideDown = false;
 
         levelData = LevelData.Instance();
-
         inventoryData = InventoryData.Instance();
     }
 
@@ -188,10 +158,27 @@ public class Level1Behavior : MonoBehaviour
     {
         Application.targetFrameRate = 60;
 
+        // Set far right bounds for where objects should be generated
+        if (Screen.width > Screen.height)
+        {
+            // Calculate the offscreen startpoint when the screen is wider than it is tall
+            cameraMaxX = (Camera.main.orthographicSize * 2.0f) * (Screen.width / Screen.height);
+        }
+        else if (Screen.height > Screen.width)
+        {
+            // Calculate the offscreen startpoint when the screen is taller than it is wide (phones or portrait iPad)
+            cameraMaxX = (Camera.main.orthographicSize);
+        }
+
         commonObject = Instantiate(commonPrefab);
         commonScript = commonObject.GetComponent<CommonBehavior>();
 
+        gameItemObjectScript = gameItemObject.GetComponent<GameItemsBehavior>();
+
         bird = commonScript.GetBirdObject();
+
+        cameraScript = gameCamera.GetComponent<CameraBehavior>();
+        cameraScript.bird = bird;
 
         List<string> collisionTags = new List<string>()
         {
@@ -207,13 +194,25 @@ public class Level1Behavior : MonoBehaviour
         };
         commonScript.AddTriggerCollisionTags(triggerTags);
 
-        cameraScript = gameCamera.GetComponent<CameraBehavior>();
-        cameraScript.bird = bird;
-
         cloudPrefabs.Add((cloud1Prefab, 0.10f));
         cloudPrefabs.Add((cloud2Prefab, 0.10f));
         cloudPrefabs.Add((cloud3Prefab, 0.10f));
         cloudPrefabs.Add((cloud4Prefab, 0.10f));
+
+        ground1Renderer = groundObject1.GetComponent<Renderer>();
+        ground2Renderer = groundObject2.GetComponent<Renderer>();
+        groundObjectsDistance = groundObject2.transform.localPosition.x - groundObject1.transform.localPosition.x;
+
+        Renderer backgroundRenderer = background.GetComponent<Renderer>();
+        // This minimum value is the minimum Y value at which objects should be generated
+        backgroundMinY = ground1Renderer.bounds.max.y + 2;
+        backgroundMaxY = backgroundRenderer.bounds.max.y - 2;
+        groundMaxY = groundObject1.transform.position.y + ground1Renderer.bounds.size.y;
+
+        minCollectibleHeight = backgroundMinY;
+        maxCollectibleHeight = backgroundMaxY;
+
+        gameItemObjectScript.InitGameObjectManager(cameraMaxX, backgroundMinY, backgroundMaxY, NUM_OBSTACLES, NUM_COLLECTIBLES);
 
         int levelNumber = LevelManager.GetCurrentLevel();
         switch (levelNumber)
@@ -239,53 +238,14 @@ public class Level1Behavior : MonoBehaviour
                 break;
         }
 
-        // Camera orientation and off-screen item start calculation is now done
-        // after the user presses the Start button
-
-        ground1Renderer = groundObject1.GetComponent<Renderer>();
-        ground2Renderer = groundObject2.GetComponent<Renderer>();
-        groundObjectsDistance = groundObject2.transform.localPosition.x - groundObject1.transform.localPosition.x;
-
-        Renderer backgroundRenderer = background.GetComponent<Renderer>();
-        // This minimum value is the minimum Y value at which objects should be generated
-        backgroundMinY = backgroundRenderer.bounds.min.y + backgroundRenderer.bounds.size.y * 0.10f;
-        backgroundMaxY = backgroundRenderer.bounds.max.y;
-        groundMaxY = groundObject1.transform.position.y + ground1Renderer.bounds.size.y;
-
         // Seed the random number generator here first
         Random.InitState(LevelManager.GetCurrentLevel());
-
-        // These are percentages for generating obstacles in a given slot
-        float[] percentages =
-        {
-            0.50f,
-            0.30f,
-            0.60f,
-            0.50f,
-            0.80f,
-            0.50f,
-            0.60f,
-            0.30f,
-            0.50f
-        };
-
-        // Calculate the mid points for each of the slots
-        float diff = (backgroundMaxY - backgroundMinY) / numberOfSlots;
-        for (int i = 0; i < numberOfSlots; ++i)
-        {
-            float slotMid = (backgroundMinY + diff / 2) + (diff * i);
-            Slot slot = new Slot();
-            slot.yPosition = slotMid;
-            slot.chance = percentages[i];
-            slots[i] = slot;
-        }
 
         InitializeFirstClouds();
 
         // Start any continuous coroutine functions here
         StartCoroutine(CheckCollisions());
         StartCoroutine(CheckItemsCollected());
-        StartCoroutine(CheckItemsForRemoval());
     }
 
     // Update is called once per frame
@@ -294,26 +254,13 @@ public class Level1Behavior : MonoBehaviour
         switch (commonScript.GetGameState())
         {
             case CommonBehavior.GameState.Active:
-                if (0f == cameraMaxX)
+                if (false == gameItemObjectScript.active)
                 {
-                    // Figure out the best place to start generating pipes off screen
-                    // It should be shortly off camera on the right side before becoming visible in the camera
-                    if (Screen.width > Screen.height)
-                    {
-                        // Calculate the offscreen startpoint when the screen is wider than it is tall
-                        cameraMaxX = (Camera.main.orthographicSize * 2.0f) * (Screen.width / Screen.height);
-                    }
-                    else if (Screen.height > Screen.width)
-                    {
-                        // Calculate the offscreen startpoint when the screen is taller than it is wide (phones or portrait iPad)
-                        cameraMaxX = (Camera.main.orthographicSize);
-                    }
+                    gameItemObjectScript.StartGame();
                 }
 
                 // Update object positions in the game
                 UpdateCloudObjects();
-                UpdateGameObjectsPositions(gameCollectibles);
-                UpdateGameObjectsPositions(gameObstacles);
                 UpdateGroundObjects();
 
                 // Update the level timer to know when to end the level
@@ -323,13 +270,11 @@ public class Level1Behavior : MonoBehaviour
                     generateItems = false;
 
                     // Generate a finish line
-                    int availableArrayIndex = gameObstacles.Length - 1;
-                    GameObject finishLine = GenerateFinishLine();
-                    AddObjectToArray(gameObstacles, availableArrayIndex, finishLine, finishLine.transform, speed);
+                    gameItemObjectScript.GenerateFinishLine();
                 }
                 else if (levelTimer >= timeForEggGeneration && generateEggItem && false == eggHasBeenGenerated)
                 {
-                    addEggToSlot = true;
+                    timeToGenerateEgg = true;
                 }
 
                 if ((levelTimer / levelTimeLength >= progress25) && false == showedProgress25)
@@ -363,14 +308,26 @@ public class Level1Behavior : MonoBehaviour
                 break;
 
             case CommonBehavior.GameState.Loss:
+                if (gameItemObjectScript.active)
+                {
+                    gameItemObjectScript.StopGame();
+                }
                 GameOver();
                 break;
 
             case CommonBehavior.GameState.Win:
+                if (gameItemObjectScript.active)
+                {
+                    gameItemObjectScript.StopGame();
+                }
                 GameOver(success: true);
                 break;
 
             case CommonBehavior.GameState.Wait:
+                if (gameItemObjectScript.active)
+                {
+                    gameItemObjectScript.StopGame();
+                }
                 // Don't do anything
                 break;
 
@@ -378,11 +335,14 @@ public class Level1Behavior : MonoBehaviour
                 // Keep objects moving after user wins
                 if (userWon)
                 {
+                    if (false == gameItemObjectScript.active)
+                    {
+                        gameItemObjectScript.StartGame();
+                    }
+
                     // Ensure all items continue moving after game is over
                     // It looks better than everything just stopping
                     UpdateCloudObjects();
-                    UpdateGameObjectsPositions(gameObstacles);
-                    UpdateGameObjectsPositions(gameCollectibles);
                     UpdateGroundObjects();
                 }
                 break;
@@ -406,8 +366,7 @@ public class Level1Behavior : MonoBehaviour
                         obstacleGenerationCounter = 0;
                         // These InstantiateX functions could be called in a coroutine
                         InstantiateClouds();
-                        // Generate a random object at a random height off screen
-                        InstantiateObstacle();
+                        gameItemObjectScript.GenerateNewObstacle(collidersWereDisabled);
                     }
                     obstacleGenerationCounter += 1;
 
@@ -415,7 +374,12 @@ public class Level1Behavior : MonoBehaviour
                     if (collectibleGenerationCounter == collectibleGenerationTurns)
                     {
                         collectibleGenerationCounter = 0;
-                        InstantiateCollectible();
+                        gameItemObjectScript.GenerateNewCollectible(timeToGenerateEgg);
+                        if (timeToGenerateEgg)
+                        {
+                            timeToGenerateEgg = false;
+                            eggHasBeenGenerated = true;
+                        }
                     }
                     collectibleGenerationCounter += 1;
                 }
@@ -437,13 +401,13 @@ public class Level1Behavior : MonoBehaviour
                 {
                     // Disable collisions; they will be update when object positions are updated
                     collidersWereDisabled = true;
-                    DisableColliders();
+                    gameItemObjectScript.DisableColliders();
                 }
                 else if (false == commonScript.disableColliders && collidersWereDisabled)
                 {
                     // Enable collisions; they will be updated when object positions are updated
                     collidersWereDisabled = false;
-                    EnableColliders();
+                    gameItemObjectScript.EnableColliders();
                 }
             }
 
@@ -489,47 +453,12 @@ public class Level1Behavior : MonoBehaviour
                     caughtEgg = true;
                 }
 
-                RemoveObjectFromGame(gameCollectibles, obj);
+                gameItemObjectScript.RemoveCollectibleFromGame(obj);
             }
 
             yield return new WaitForSeconds(0.1f);
         }
     }
-
-    IEnumerator CheckItemsForRemoval()
-    {
-        for (; ;)
-        {
-            for (int i = 0; i < gameObstacles.Length; ++i)
-            {
-                if (gameObstacles[i].used)
-                {
-                    Renderer r = gameObstacles[i].renderer;
-                    if (r.bounds.max.x < (-1 * cameraMaxX))
-                    {
-                        GameObject obj = gameObstacles[i].gameObject;
-                        RemoveObjectFromGame(gameObstacles, obj);
-                    }
-                }
-            }
-
-            for (int i = 0; i < gameCollectibles.Length; ++i)
-            {
-                if (gameCollectibles[i].used)
-                {
-                    Renderer r = gameCollectibles[i].renderer;
-                    if (r.bounds.max.x < (-1 * cameraMaxX))
-                    {
-                        GameObject obj = gameCollectibles[i].gameObject;
-                        RemoveObjectFromGame(gameCollectibles, obj);
-                    }
-                }
-            }
-
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
-
     #endregion
 
 
@@ -537,7 +466,7 @@ public class Level1Behavior : MonoBehaviour
     private void GameOver(bool success = false)
     {
         collidersWereDisabled = true;
-        DisableColliders();
+        gameItemObjectScript.DisableColliders();
 
         userWon = success;
 
@@ -695,27 +624,6 @@ public class Level1Behavior : MonoBehaviour
         commonScript.CleanupDone(nextLevelUnlocked);
     }
 
-    private GameObject GenerateFinishLine()
-    {
-        GameObject finishLine = Instantiate(finishLinePrefab);
-        float lineWidth = finishLine.GetComponent<Renderer>().bounds.size.x;
-        Vector3 pos = finishLine.transform.localPosition;
-        Vector3 newPos = new Vector3(cameraMaxX + lineWidth, pos.y, pos.z);
-
-        float maxObjectX = GetMaxObjectBound();
-        if (maxObjectX > newPos.x)
-        {
-            newPos.x = maxObjectX + lineWidth;
-            finishLine.transform.localPosition = newPos;
-        }
-        else
-        {
-            finishLine.transform.localPosition = newPos;
-        }
-
-        return finishLine;
-    }
-
     private void InitializeFirstClouds()
     {
         int numClouds = Random.Range(2, 5);
@@ -802,270 +710,6 @@ public class Level1Behavior : MonoBehaviour
         }
     }
 
-    private ObstaclePrefab SelectPrefab()
-    {
-        ObstaclePrefab op = new ObstaclePrefab();
-        float choice = Random.Range(0f, 1f);
-        foreach (ObstaclePrefab thing in obstaclePrefabs)
-        {
-            if (choice <= thing.maxChance && choice >= thing.minChance)
-            {
-                return thing;
-            }
-        }
-
-        return op;
-    }
-
-    private void TestSlots()
-    {
-        for (int i = 0; i < numberOfSlots; ++i)
-        {
-            int availableArrayIndex = FindAvailableArraySlot(gameObstacles);
-            if (availableArrayIndex < 0)
-            {
-                // Don't generate a new obstacle because there aren't any available slots
-                return;
-            }
-
-            Slot slot = slots[i];
-            GameObject obj = Instantiate(blimp2Prefab);
-            Renderer r = obj.GetComponent<Renderer>();
-            PolygonCollider2D pc = obj.GetComponent<PolygonCollider2D>();
-            float objWidth = r.bounds.size.x;
-            float xStart = cameraMaxX + (objWidth / 2);
-            float yStart = slot.yPosition;
-
-            Vector3 pos = obj.transform.localPosition;
-            pos.x = xStart;
-            pos.y = yStart;
-            obj.transform.localPosition = pos;
-
-            Direction d = Direction.none;
-            AddObjectToArray(gameObstacles, availableArrayIndex, obj, obj.transform, speed, d, r, pc);
-        }
-    }
-
-    private void GenerateEgg()
-    {
-        int availableArrayIndex = gameCollectibles.Length - 1;
-
-        int si = collectibleSlots[sysRandom.Next(0, collectibleSlots.Length)];
-        while (si == prevCollectibleSlotIndex)
-        {
-            si = collectibleSlots[sysRandom.Next(0, collectibleSlots.Length)];
-        }
-
-        Slot slot = slots[si];
-
-        // Generate this collectible item type
-        GameObject obj = Instantiate(eggPrefab);
-        Renderer r = obj.GetComponent<Renderer>();
-        PolygonCollider2D pc = obj.GetComponent<PolygonCollider2D>();
-        float objWidth = r.bounds.size.x;
-        float xStart = cameraMaxX + (objWidth / 2);
-        float yStart = slot.yPosition;
-
-        Vector3 pos = obj.transform.localPosition;
-        pos.x = xStart;
-        pos.y = yStart;
-        obj.transform.localPosition = pos;
-
-        Direction d = Direction.none;
-        AddObjectToArray(gameCollectibles, availableArrayIndex, obj, obj.transform, speed, d, r, pc);
-    }
-
-    private int FindAvailableArraySlot(GameObstacle[] array)
-    {
-        if (array.Length > 0)
-        {
-            for (int i = 0; i < array.Length; ++i)
-            {
-                if (false == array[i].used)
-                {
-                    return i;
-                }
-            }
-        }
-
-        return -1;
-    }
-
-    private void InstantiateCollectible()
-    {
-        if (addEggToSlot)
-        {
-            GenerateEgg();
-            addEggToSlot = false;
-            eggHasBeenGenerated = true;
-            return;
-        }
-
-        int availableArrayIndex = FindAvailableArraySlot(gameCollectibles);
-        if (availableArrayIndex < 0 || (gameCollectibles.Length - 1) == availableArrayIndex)
-        {
-            // Don't generate a new collectible because there aren't any available slots
-            return;
-        }
-
-        int si = collectibleSlots[sysRandom.Next(0, collectibleSlots.Length)];
-        // Ensure we don't use the same slot as time
-
-        Slot slot = slots[si];
-
-        float chance = (float)sysRandom.NextDouble();
-        if (chance < slot.chance)
-        {
-            prevCollectibleSlotIndex = si;
-
-            // Generate a collectible item in slots 3, 5, and 7
-            GameObject prefab = collectiblePrefabArray[sysRandom.Next(0, collectiblePrefabArray.Length)];
-            if (null != prefab)
-            {
-                if (prefab == strawberryPrefab && strawberryWasGenerated)
-                {
-                    return;
-                }
-
-                if (prefab == strawberryPrefab)
-                {
-                    // We only want to generate 1 strawberry per level
-                    strawberryWasGenerated = true;
-                }
-
-                // Generate this collectible item type
-                GameObject obj = Instantiate(prefab);
-                Renderer r = obj.GetComponent<Renderer>();
-                PolygonCollider2D pc = obj.GetComponent<PolygonCollider2D>();
-                float objWidth = r.bounds.size.x;
-                float xStart = cameraMaxX + (objWidth / 2);
-                float yStart = slot.yPosition;
-
-                Vector3 pos = obj.transform.localPosition;
-                pos.x = xStart;
-                pos.y = yStart;
-                obj.transform.localPosition = pos;
-
-                Direction d = Direction.none;
-                AddObjectToArray(gameCollectibles, availableArrayIndex, obj, obj.transform, speed, d, r, pc);
-            }
-        }
-    }
-
-    private void InstantiateObstacle()
-    {
-        int availableArrayIndex = FindAvailableArraySlot(gameObstacles);
-        if (availableArrayIndex < 0 || (gameObstacles.Length - 1) == availableArrayIndex)
-        {
-            // Don't generate a new obstacle because there aren't any available slots
-            return;
-        }
-
-        int si = obstacleSlots[Random.Range(0, obstacleSlots.Length - 1)];
-        // Ensure we don't use the same slot as time
-        while (si == prevObstacleSlotIndex)
-        {
-            si = obstacleSlots[Random.Range(0, obstacleSlots.Length - 1)];
-        }
-
-        Slot slot = slots[si];
-
-        float chance = Random.Range(0f, 1f);
-        if (chance < slot.chance)
-        {
-            prevObstacleSlotIndex = si;
-
-            // Generate an obstacle in this slot
-            ObstaclePrefab op = SelectPrefab();
-            if (null != op.prefab)
-            {
-                Direction d = op.directions[Random.Range(0, op.directions.Length)];
-                GameObject obj = Instantiate(op.prefab);
-                Renderer r = obj.GetComponent<Renderer>();
-                PolygonCollider2D pc = obj.GetComponent<PolygonCollider2D>();
-                float objWidth = r.bounds.size.x;
-                float xStart = cameraMaxX + (objWidth / 2);
-                float yStart = slot.yPosition;
-
-                Vector3 pos = obj.transform.localPosition;
-                pos.x = xStart;
-                pos.y = yStart;
-                obj.transform.localPosition = pos;
-
-                // Check to see if collider should be disabled for now
-                if (collidersWereDisabled)
-                {
-                    pc.enabled = false;
-                }
-
-                float _speed = Random.Range(op.minSpeed, op.maxSpeed);
-
-                AddObjectToArray(gameObstacles, availableArrayIndex, obj, obj.transform, _speed, d, r, pc);
-            }
-        }
-    }
-
-    private void UpdateGameObjectsPositions(GameObstacle[] array)
-    {
-        for (int i = 0; i < array.Length; ++i)
-        {
-            if (array[i].used)
-            {
-                Transform t = array[i].transform;
-
-                Vector3 pos = t.localPosition;
-                pos.x -= array[i].xDelta;
-                pos.y += array[i].yDelta;
-                t.localPosition = pos;
-            }
-        }
-    }
-
-    private void RemoveObjectFromGame(GameObstacle[] array, GameObject obj)
-    {
-        for (int i = 0; i < array.Length; ++i)
-        {
-            GameObject go = array[i].gameObject;
-            if (obj == go)
-            {
-                Destroy(go);
-                array[i].used = false;
-            }
-        }
-    }
-
-    private void DisableColliders()
-    {
-        for (int i = 0; i < gameObstacles.Length; ++i)
-        {
-            if (gameObstacles[i].used)
-            {
-                GameObject obj = gameObstacles[i].gameObject;
-                PolygonCollider2D pc = gameObstacles[i].collider;
-                if (obj.tag != "FinishLine" && obj.tag != "Collectible")
-                {
-                    pc.enabled = false;
-                }
-            }
-        }
-    }
-
-    private void EnableColliders()
-    {
-        for (int i = 0; i < gameObstacles.Length; ++i)
-        {
-            if (gameObstacles[i].used)
-            {
-                GameObject obj = gameObstacles[i].gameObject;
-                PolygonCollider2D pc = gameObstacles[i].collider;
-                if (obj.tag != "FinishLine" && obj.tag != "Collectible")
-                {
-                    pc.enabled = true;
-                }
-            }
-        }
-    }
-
     private float GetObjectsBoundCenter(Renderer r)
     {
         return r.bounds.center.x;
@@ -1097,343 +741,364 @@ public class Level1Behavior : MonoBehaviour
         }
     }
 
-    private float GetMaxObjectBound()
-    {
-        float max = 0f;
-        for (int i = 0; i < gameObstacles.Length; ++i)
-        {
-            if (gameObstacles[i].used)
-            {
-                Renderer r = gameObstacles[i].renderer;
-                if (null != r)
-                {
-                    if (r.bounds.max.x > max)
-                    {
-                        max = r.bounds.max.x;
-                    }
-                }
-            }
-        }
-
-        return max;
-    }
-
-    private void AddObjectToArray(GameObstacle[] array, int index, GameObject obj, Transform transform,
-                                  float _speed, Direction d = Direction.none, Renderer _renderer = null,
-                                  PolygonCollider2D _collider = null)
-    {
-        Renderer r;
-        PolygonCollider2D pc;
-
-        if (null == _renderer)
-        {
-            r = obj.GetComponent<Renderer>();
-        }
-        else
-        {
-            r = _renderer;
-        }
-
-        if (null == _collider)
-        {
-            pc = obj.GetComponent<PolygonCollider2D>();
-        }
-        else
-        {
-            pc = _collider;
-        }
-
-        float yDelta = 0f;
-        switch (d)
-        {
-            case Direction.up:
-                yDelta = Random.Range(0.0005f, 0.006f);
-                break;
-
-            case Direction.down:
-                yDelta = -1 * Random.Range(0.0005f, 0.006f);
-                break;
-        }
-
-        GameObstacle obstacle = new GameObstacle();
-        obstacle.gameObject = obj;
-        obstacle.transform = transform;
-        obstacle.renderer = r;
-        obstacle.collider = pc;
-        obstacle.yDelta = yDelta;
-        obstacle.xDelta = _speed * 1.10f;
-        obstacle.used = true;
-
-        array[index] = obstacle;
-    }
-
-    private void AddNewPrefab(GameObject prefab, float minSpeed, float maxSpeed, float minChance, float maxChance, Direction[] directions)
-    {
-        ObstaclePrefab op = new ObstaclePrefab();
-        op.prefab = prefab;
-        op.minChance = minChance;
-        op.maxChance = maxChance;
-        op.minSpeed = minSpeed;
-        op.maxSpeed = maxSpeed;
-        op.directions = directions;
-        obstaclePrefabs.Add(op);
-    }
-
     private void Level1Prep()
     {
-        // Setting up the obstacle prefabs
-        Direction[] enemyDirections =
-        {
-            Direction.up,
-            Direction.down
-        };
-
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.0f;
+        float enemyBirdMaxChance = 1.0f;
 
-        AddNewPrefab(enemyBirdPrefab, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.00f, 1.00f, enemyDirections);
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
 
-        // 1 banana
-        // 3 coins
-        collectiblePrefabArray = new GameObject[6];
-        collectiblePrefabArray[0] = bananaPrefab;
-        for (int i = 1; i < 4; ++i)
-        {
-            collectiblePrefabArray[i] = coinPrefab;
-        }
 
-        commonScript.InitItemCanvasImage(0, collectibleItem1Sprite);
-        commonScript.InitItemCanvasImage(1, collectibleItem2Sprite);
+        // Setup the display at the top to show collectible items for the level
+        commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.19f;
+
+        float coinMinChance = 0.20f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level2Prep()
     {
-        Direction[] blimpDirections =
-        {
-            Direction.up,
-            Direction.down
-        };
-        Direction[] enemyDirections =
-        {
-            Direction.up,
-            Direction.down
-        };
-
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.41f;
+        float enemyBirdMaxChance = 1.0f;
 
-        float blimpMinSpeed = 0.055f;
-        float blimpMaxSpeed = 0.065f;
+        float blimp1MinSpeed = 0.055f;
+        float blimp1MaxSpeed = 0.065f;
+        float blimp1MinChance = 0.0f;
+        float blimp1MaxChance = 0.20f;
 
-        AddNewPrefab(blimp1Prefab, blimpMinSpeed, blimpMaxSpeed, 0.00f, 0.20f, blimpDirections);
-        AddNewPrefab(blimp2Prefab, blimpMinSpeed, blimpMaxSpeed, 0.21f, 0.40f, blimpDirections);
-        AddNewPrefab(enemyBirdPrefab, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.41f, 1.00f, enemyDirections);
+        float blimp2MinSpeed = 0.060f;
+        float blimp2MaxSpeed = 0.070f;
+        float blimp2MinChance = 0.21f;
+        float blimp2MaxChance = 0.40f;
 
-        // 1 banana
-        // 3 coins
-        collectiblePrefabArray = new GameObject[6];
-        collectiblePrefabArray[0] = bananaPrefab;
-        for (int i = 1; i < 4; ++i)
-        {
-            collectiblePrefabArray[i] = coinPrefab;
-        }
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp1MinSpeed, blimp1MaxSpeed, blimp1MinChance, blimp1MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp2Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                       blimp2MinSpeed, blimp2MaxSpeed, blimp2MinChance, blimp2MaxChance,
+                                       backgroundMinY, backgroundMaxY, 0, 0);
 
-        commonScript.InitItemCanvasImage(0, collectibleItem1Sprite);
-        commonScript.InitItemCanvasImage(1, collectibleItem2Sprite);
+
+        // Setup the display at the top to show collectible items for the level
+        commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.19f;
+
+        float coinMinChance = 0.20f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level3Prep()
     {
-        Direction[] blimpDirections = {
-            Direction.up,
-            Direction.down
-        };
-        Direction[] parachuteDirections =
-        {
-            Direction.down
-        };
-        Direction[] enemyDirections =
-        {
-            Direction.up,
-            Direction.down
-        };
-
-        float enemyBirdMinSpeed = 0.05f;
-        float enemyBirdMaxSpeed = 0.055f;
-
-        float blimpMinSpeed = 0.055f;
-        float blimpMaxSpeed = 0.065f;
-
-        float parachuteMinSpeed = 0.04f;
-        float parachuteMaxSpeed = 0.045f;
-
         background.GetComponent<SpriteRenderer>().sprite = sunsetSkySprite;
         groundObject1.GetComponent<SpriteRenderer>().sprite = sunsetGroundCloudsSprite;
         groundObject2.GetComponent<SpriteRenderer>().sprite = sunsetGroundCloudsSprite;
-        AddNewPrefab(blimp1Prefab, blimpMinSpeed, blimpMaxSpeed, 0.00f, 0.16f, blimpDirections);
-        AddNewPrefab(blimp2Prefab, blimpMinSpeed, blimpMaxSpeed, 0.17f, 0.33f, blimpDirections);
-        AddNewPrefab(parachute1Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.34f, 0.44f, parachuteDirections);
-        AddNewPrefab(parachute2Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.45f, 0.55f, parachuteDirections);
-        AddNewPrefab(parachute3Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.56f, 0.66f, parachuteDirections);
-        AddNewPrefab(enemyBirdPrefab, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.67f, 1.00f, enemyDirections);
 
-        // 1 blueberry
-        // 2 bananas
-        // 6 coins
-        collectiblePrefabArray = new GameObject[12];
-        collectiblePrefabArray[0] = blueberryPrefab;
-        for (int i = 1; i < 3; ++i)
-        {
-            collectiblePrefabArray[i] = bananaPrefab;
-        }
-        for (int i = 3; i < 9; ++i)
-        {
-            collectiblePrefabArray[i] = coinPrefab;
-        }
+        // Add obstacles to the level
+        float enemyBirdMinSpeed = 0.05f;
+        float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.67f;
+        float enemyBirdMaxChance = 1.0f;
 
-        commonScript.InitItemCanvasImage(0, collectibleItem1Sprite);
-        commonScript.InitItemCanvasImage(1, collectibleItem2Sprite);
-        commonScript.InitItemCanvasImage(2, collectibleItem3Sprite);
+        float blimp1MinSpeed = 0.055f;
+        float blimp1MaxSpeed = 0.065f;
+        float blimp1MinChance = 0.0f;
+        float blimp1MaxChance = 0.16f;
+
+        float blimp2MinSpeed = 0.060f;
+        float blimp2MaxSpeed = 0.070f;
+        float blimp2MinChance = 0.17f;
+        float blimp2MaxChance = 0.33f;
+
+        float parachuteMinSpeed = GameItemsBehavior.BASE_SPEED;
+        float parachuteMaxSpeed = 0.045f;
+        float parachuteMinGenY = 0f;
+        float parachuteMaxGenY = backgroundMaxY;
+
+        float parachute1MinChance = 0.34f;
+        float parachute1MaxChance = 0.44f;
+
+        float parachute2MinChance = 0.45f;
+        float parachute2MaxChance = 0.55f;
+
+        float parachute3MinChance = 0.56f;
+        float parachute3MaxChance = 0.66f;
+
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp1MinSpeed, blimp1MaxSpeed, blimp1MinChance, blimp1MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp2MinSpeed, blimp2MaxSpeed, blimp2MinChance, blimp2MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddParachute1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                   parachuteMinSpeed, parachuteMaxSpeed, parachute1MinChance, parachute1MaxChance,
+                                                   parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddParachute2Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                           parachuteMinSpeed, parachuteMaxSpeed, parachute2MinChance, parachute2MaxChance,
+                                           parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddParachute3Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                   parachuteMinSpeed, parachuteMaxSpeed, parachute3MinChance, parachute3MaxChance,
+                                                   parachuteMinGenY, parachuteMaxGenY, 0, 0);
+
+
+        // Setup the display at the top to show collectible items for the level
+        commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(2, gameItemObjectScript.blueberriesPrefab.GetComponent<SpriteRenderer>().sprite);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.20f;
+
+        float blueberryMinChance = 0.21f;
+        float blueberryMaxChance = 0.30f;
+
+        float coinMinChance = 0.31f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                     GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
+                                                     minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level4Prep()
     {
-        Direction[] blimpDirections = {
-            Direction.up,
-            Direction.down
-        };
-        Direction[] planeDirections =
-        {
-            Direction.none
-        };
-        Direction[] parachuteDirections =
-        {
-            Direction.down
-        };
-        Direction[] enemyDirections =
-        {
-            Direction.up,
-            Direction.down
-        };
+        background.GetComponent<SpriteRenderer>().sprite = sunsetSkySprite;
+        groundObject1.GetComponent<SpriteRenderer>().sprite = sunsetGroundCloudsSprite;
+        groundObject2.GetComponent<SpriteRenderer>().sprite = sunsetGroundCloudsSprite;
 
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.79f;
+        float enemyBirdMaxChance = 1.0f;
 
-        float blimpMinSpeed = 0.055f;
-        float blimpMaxSpeed = 0.065f;
+        float blimp1MinSpeed = 0.055f;
+        float blimp1MaxSpeed = 0.065f;
+        float blimp1MinChance = 0.0f;
+        float blimp1MaxChance = 0.12f;
+
+        float blimp2MinSpeed = 0.060f;
+        float blimp2MaxSpeed = 0.070f;
+        float blimp2MinChance = 0.13f;
+        float blimp2MaxChance = 0.25f;
+
+        float parachuteMinSpeed = GameItemsBehavior.BASE_SPEED;
+        float parachuteMaxSpeed = 0.045f;
+        float parachuteMinGenY = 0f;
+        float parachuteMaxGenY = backgroundMaxY;
+
+        float parachute1MinChance = 0.52f;
+        float parachute1MaxChance = 0.60f;
+
+        float parachute2MinChance = 0.61f;
+        float parachute2MaxChance = 0.69f;
+
+        float parachute3MinChance = 0.70f;
+        float parachute3MaxChance = 0.78f;
 
         float planeMinSpeed = 0.10f;
         float planeMaxSpeed = 0.12f;
 
-        float parachuteMinSpeed = 0.04f;
-        float parachuteMaxSpeed = 0.045f;
+        float plane1MinChance = 0.26f;
+        float plane1MaxChance = 0.38f;
 
-        background.GetComponent<SpriteRenderer>().sprite = sunsetSkySprite;
-        groundObject1.GetComponent<SpriteRenderer>().sprite = sunsetGroundCloudsSprite;
-        groundObject2.GetComponent<SpriteRenderer>().sprite = sunsetGroundCloudsSprite;
-        AddNewPrefab(blimp1Prefab, blimpMinSpeed, blimpMaxSpeed, 0.00f, 0.12f, blimpDirections);
-        AddNewPrefab(blimp2Prefab, blimpMinSpeed, blimpMaxSpeed, 0.13f, 0.25f, blimpDirections);
-        AddNewPrefab(plane1Prefab, planeMinSpeed, planeMaxSpeed, 0.26f, 0.38f, planeDirections);
-        AddNewPrefab(plane2Prefab, planeMinSpeed, planeMaxSpeed, 0.39f, 0.51f, planeDirections);
-        AddNewPrefab(parachute1Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.52f, 0.60f, parachuteDirections);
-        AddNewPrefab(parachute2Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.61f, 0.69f, parachuteDirections);
-        AddNewPrefab(parachute3Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.70f, 0.78f, parachuteDirections);
-        AddNewPrefab(enemyBirdPrefab, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.79f, 1.00f, enemyDirections);
+        float plane2MinChance = 0.39f;
+        float plane2MaxChance = 0.51f;
 
-        // 1 blueberry
-        // 2 bananas
-        // 6 coins
-        collectiblePrefabArray = new GameObject[12];
-        collectiblePrefabArray[0] = blueberryPrefab;
-        for (int i = 1; i < 3; ++i)
-        {
-            collectiblePrefabArray[i] = bananaPrefab;
-        }
-        for (int i = 3; i < 9; ++i)
-        {
-            collectiblePrefabArray[i] = coinPrefab;
-        }
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp1MinSpeed, blimp1MaxSpeed, blimp1MinChance, blimp1MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp2MinSpeed, blimp2MaxSpeed, blimp2MinChance, blimp2MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddParachute1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                   parachuteMinSpeed, parachuteMaxSpeed, parachute1MinChance, parachute1MaxChance,
+                                                   parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddParachute2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                           parachuteMinSpeed, parachuteMaxSpeed, parachute2MinChance, parachute2MaxChance,
+                                           parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddParachute3Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                   parachuteMinSpeed, parachuteMaxSpeed, parachute3MinChance, parachute3MaxChance,
+                                                   parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddPlane1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               planeMinSpeed, planeMaxSpeed, plane1MinChance, plane1MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddPlane2Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               planeMinSpeed, planeMaxSpeed, plane2MinChance, plane2MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
 
-        commonScript.InitItemCanvasImage(0, collectibleItem1Sprite);
-        commonScript.InitItemCanvasImage(1, collectibleItem2Sprite);
-        commonScript.InitItemCanvasImage(2, collectibleItem3Sprite);
+
+        // Setup the display at the top to show collectible items for the level
+        commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(2, gameItemObjectScript.blueberriesPrefab.GetComponent<SpriteRenderer>().sprite);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.20f;
+
+        float blueberryMinChance = 0.21f;
+        float blueberryMaxChance = 0.30f;
+
+        float coinMinChance = 0.31f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                     GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
+                                                     minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level5Prep()
     {
-        Direction[] blimpDirections = {
-            Direction.up,
-            Direction.down
-        };
-        Direction[] planeDirections =
-        {
-            Direction.none
-        };
-        Direction[] parachuteDirections =
-        {
-            Direction.down
-        };
-        Direction[] balloonDirections =
-        {
-            Direction.up
-        };
-        Direction[] enemyDirections =
-        {
-            Direction.up,
-            Direction.down
-        };
+        background.GetComponent<SpriteRenderer>().sprite = nightSkySprite;
+        groundObject1.GetComponent<SpriteRenderer>().sprite = nightGroundCloudsSprite;
+        groundObject2.GetComponent<SpriteRenderer>().sprite = nightGroundCloudsSprite;
 
+        // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
+        float enemyBirdMinChance = 0.88f;
+        float enemyBirdMaxChance = 1.0f;
 
-        float blimpMinSpeed = 0.055f;
-        float blimpMaxSpeed = 0.065f;
+        float blimp1MinSpeed = 0.055f;
+        float blimp1MaxSpeed = 0.065f;
+        float blimp1MinChance = 0.0f;
+        float blimp1MaxChance = 0.10f;
+
+        float blimp2MinSpeed = 0.060f;
+        float blimp2MaxSpeed = 0.070f;
+        float blimp2MinChance = 0.11f;
+        float blimp2MaxChance = 0.21f;
+
+        float parachuteMinSpeed = GameItemsBehavior.BASE_SPEED;
+        float parachuteMaxSpeed = 0.045f;
+        float parachuteMinGenY = 0f;
+        float parachuteMaxGenY = backgroundMaxY;
+
+        float parachute1MinChance = 0.67f;
+        float parachute1MaxChance = 0.73f;
+
+        float parachute2MinChance = 0.74f;
+        float parachute2MaxChance = 0.80f;
+
+        float parachute3MinChance = 0.81f;
+        float parachute3MaxChance = 0.87f;
 
         float planeMinSpeed = 0.10f;
         float planeMaxSpeed = 0.12f;
 
-        float parachuteMinSpeed = 0.04f;
-        float parachuteMaxSpeed = 0.045f;
+        float plane1MinChance = 0.22f;
+        float plane1MaxChance = 0.32f;
 
-        float balloonMinSpeed = 0.04f;
+        float plane2MinChance = 0.33f;
+        float plane2MaxChance = 0.43f;
+
+        float balloonMinSpeed = GameItemsBehavior.BASE_SPEED;
         float balloonMaxSpeed = 0.045f;
+        float balloonMinGenY = backgroundMinY;
+        float balloonMaxGenY = 0;
 
-        background.GetComponent<SpriteRenderer>().sprite = nightSkySprite;
-        groundObject1.GetComponent<SpriteRenderer>().sprite = nightGroundCloudsSprite;
-        groundObject2.GetComponent<SpriteRenderer>().sprite = nightGroundCloudsSprite;
-        AddNewPrefab(blimp1Prefab, blimpMinSpeed, blimpMaxSpeed, 0.00f, 0.10f, blimpDirections);
-        AddNewPrefab(blimp2Prefab, blimpMinSpeed, blimpMaxSpeed, 0.11f, 0.21f, blimpDirections);
-        AddNewPrefab(plane1Prefab, planeMinSpeed, planeMaxSpeed, 0.22f, 0.32f, planeDirections);
-        AddNewPrefab(plane2Prefab, planeMinSpeed, planeMaxSpeed, 0.33f, 0.43f, planeDirections);
-        AddNewPrefab(balloon1Prefab, balloonMinSpeed, balloonMaxSpeed, 0.44f, 0.54f, balloonDirections);
-        AddNewPrefab(balloon2Prefab, balloonMinSpeed, balloonMaxSpeed, 0.55f, 0.65f, balloonDirections);
-        AddNewPrefab(balloon3Prefab, balloonMinSpeed, balloonMaxSpeed, 0.66f, 0.66f, balloonDirections);
-        AddNewPrefab(parachute1Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.67f, 0.73f, parachuteDirections);
-        AddNewPrefab(parachute2Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.74f, 0.80f, parachuteDirections);
-        AddNewPrefab(parachute3Prefab, parachuteMinSpeed, parachuteMaxSpeed, 0.81f, 0.87f, parachuteDirections);
-        AddNewPrefab(enemyBirdPrefab, enemyBirdMinSpeed, enemyBirdMaxSpeed, 0.88f, 1.00f, enemyDirections);
+        float balloon1MinChance = 0.44f;
+        float balloon1MaxChance = 0.54f;
 
-        // 1 strawberry
-        // 8 blueberries
-        // 16 bananas
-        // 50 coins
-        collectiblePrefabArray = new GameObject[100];
-        collectiblePrefabArray[0] = strawberryPrefab;
-        collectiblePrefabArray[1] = strawberryPrefab;
-        for (int i = 2; i < 11; ++i)
-        {
-            collectiblePrefabArray[i] = blueberryPrefab;
-        }
-        for (int i = 11; i < 27; ++i)
-        {
-            collectiblePrefabArray[i] = bananaPrefab;
-        }
-        for (int i = 27; i < 75; ++i)
-        {
-            collectiblePrefabArray[i] = coinPrefab;
-        }
+        float balloon2MinChance = 0.55f;
+        float balloon2MaxChance = 0.65f;
 
-        // Only generate the egg if it hasn't been caught yet
+        float balloon3MinChance = 0.66f;
+        float balloon3MaxChance = 0.76f;
+
+        gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  enemyBirdMinSpeed, enemyBirdMaxSpeed, enemyBirdMinChance, enemyBirdMaxChance,
+                                                  backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp1MinSpeed, blimp1MaxSpeed, blimp1MinChance, blimp1MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBlimp2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               blimp2MinSpeed, blimp2MaxSpeed, blimp2MinChance, blimp2MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddParachute1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                   parachuteMinSpeed, parachuteMaxSpeed, parachute1MinChance, parachute1MaxChance,
+                                                   parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddParachute2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                           parachuteMinSpeed, parachuteMaxSpeed, parachute2MinChance, parachute2MaxChance,
+                                           parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddParachute3Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                   parachuteMinSpeed, parachuteMaxSpeed, parachute3MinChance, parachute3MaxChance,
+                                                   parachuteMinGenY, parachuteMaxGenY, 0, 0);
+        gameItemObjectScript.AddPlane1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               planeMinSpeed, planeMaxSpeed, plane1MinChance, plane1MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddPlane2Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                               planeMinSpeed, planeMaxSpeed, plane2MinChance, plane2MaxChance,
+                                               backgroundMinY, backgroundMaxY, 0, 0);
+        gameItemObjectScript.AddBalloon1Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                 balloonMinSpeed, balloonMaxSpeed, balloon1MinChance, balloon1MaxChance,
+                                                 balloonMinGenY, balloonMaxGenY, 0, 0);
+        gameItemObjectScript.AddBalloon2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                 balloonMinSpeed, balloonMaxSpeed, balloon2MinChance, balloon2MaxChance,
+                                                 balloonMinGenY, balloonMaxGenY, 0, 0);
+        gameItemObjectScript.AddBalloon3Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                 balloonMinSpeed, balloonMaxSpeed, balloon3MinChance, balloon3MaxChance,
+                                                 balloonMinGenY, balloonMaxGenY, 0, 0);
+
+
+
         if (false == inventoryData.IsBirdInInventory(InventoryData.SAM_ID))
         {
             generateEggItem = true;
@@ -1441,12 +1106,38 @@ public class Level1Behavior : MonoBehaviour
             // DO THIS BEFORE WE SEED UNITYENGINE RANDOM!!!
             timeForEggGeneration = Random.Range(1.0f, levelTimeLength);
 
-            commonScript.InitItemCanvasImage(7, eggSprite);
+            commonScript.InitItemCanvasImage(7, gameItemObjectScript.eggPrefab.GetComponent<SpriteRenderer>().sprite);
         }
 
-        commonScript.InitItemCanvasImage(0, collectibleItem1Sprite);
-        commonScript.InitItemCanvasImage(1, collectibleItem2Sprite);
-        commonScript.InitItemCanvasImage(2, collectibleItem3Sprite);
-        commonScript.InitItemCanvasImage(3, collectibleItem4Sprite);
+        commonScript.InitItemCanvasImage(0, gameItemObjectScript.coinPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(1, gameItemObjectScript.bananaPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(2, gameItemObjectScript.blueberriesPrefab.GetComponent<SpriteRenderer>().sprite);
+        commonScript.InitItemCanvasImage(3, gameItemObjectScript.strawberryPrefab.GetComponent<SpriteRenderer>().sprite);
+
+
+
+        // Add collectibles to the level
+        float bananaMinChance = 0.0f;
+        float bananaMaxChance = 0.20f;
+
+        float blueberryMinChance = 0.21f;
+        float blueberryMaxChance = 0.30f;
+
+        float strawberryMinChance = 0.31f;
+        float strawberryMaxChance = 0.34f;
+
+        float coinMinChance = 0.35f;
+        float coinMaxChance = 1.0f;
+        gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                  GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
+                                                  minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                     GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
+                                                     minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddStrawberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, 1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
+                                                      strawberryMinChance, strawberryMaxChance, minCollectibleHeight, maxCollectibleHeight);
+        gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
+                                                GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollectibleItemBehavior : MonoBehaviour
+public class Blimp1Behavior : MonoBehaviour
 {
     public PolygonCollider2D collider;
     public GameObstacleBehavior gameObstacleScript;
@@ -10,6 +10,7 @@ public class CollectibleItemBehavior : MonoBehaviour
     public ObstaclePrefab op;
 
     private float xDelta;
+    private float yDelta;
 
     private bool init;
 
@@ -19,15 +20,19 @@ public class CollectibleItemBehavior : MonoBehaviour
         op = gameObstacleScript.op;
 
         xDelta = Random.Range(op.minSpeed, op.maxSpeed);
-
-        System.Random sysRandom = new System.Random();
+        if (Random.Range(0, 2) > 0)
+        {
+            yDelta = Random.Range(0.0005f, 0.006f);
+        }
+        else
+        {
+            yDelta = -1 * Random.Range(0.0005f, 0.006f);
+        }
 
         Vector3 pos = transform.localPosition;
         pos.x = op.startX;
-        pos.y = (float)(sysRandom.NextDouble() * (op.maxGenY - op.minGenY) + op.minGenY);
+        pos.y = Random.Range(op.minGenY, op.maxGenY);
         transform.localPosition = pos;
-
-        collider.enabled = true;
 
         init = true;
     }
@@ -42,8 +47,19 @@ public class CollectibleItemBehavior : MonoBehaviour
 
         if (gameObstacleScript.active)
         {
+            // Do whatever is needed to move the object
+            if (gameObstacleScript.disableColliders && collider.enabled)
+            {
+                collider.enabled = false;
+            }
+            else if (!gameObstacleScript.disableColliders && !collider.enabled)
+            {
+                collider.enabled = true;
+            }
+
             Vector3 pos = transform.localPosition;
             pos.x -= xDelta;
+            pos.y += yDelta;
             transform.localPosition = pos;
 
             if (pos.x <= op.endX)

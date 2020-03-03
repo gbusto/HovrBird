@@ -104,23 +104,21 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
     private bool timeToGenerateEgg;
     private bool caughtEgg;
 
+    private float minCollectibleHeight;
+    private float maxCollectibleHeight;
+
     private const int NUM_OBSTACLES = 15;
     private const int NUM_COLLECTIBLES = 7;
 
     // NOTE: Common level attributes
     private LevelData levelData;
     private InventoryData inventoryData;
-    private System.Random sysRandom;
 
     // NOTE: Anything pertaining to generating game obstacles will be level-specific
 
 
     private void Awake()
     {
-        // NOTE: Common level initialization
-        // DO NOT SEED THIS RANDOM
-        sysRandom = new System.Random();
-
         // NOTE: Common level initialization
         Screen.orientation = ScreenOrientation.Landscape;
         Screen.autorotateToLandscapeLeft = true;
@@ -138,8 +136,6 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
     {
         // NOTE: Common level initialization
         Application.targetFrameRate = 60;
-
-        Physics2D.IgnoreLayerCollision(8, 9);
 
         if (Screen.width > Screen.height)
         {
@@ -185,9 +181,12 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
 
         Renderer backgroundRenderer = background.GetComponent<Renderer>();
         // This minimum value is the minimum Y value at which objects should be generated
-        backgroundMinY = backgroundRenderer.bounds.min.y + backgroundRenderer.bounds.size.y * 0.12f;
-        backgroundMaxY = backgroundRenderer.bounds.max.y * 0.95f;
+        backgroundMinY = ground1Renderer.bounds.max.y + 2;
+        backgroundMaxY = backgroundRenderer.bounds.max.y - 2;
         groundMaxY = groundObject1.transform.position.y + ground1Renderer.bounds.size.y;
+
+        minCollectibleHeight = backgroundMinY;
+        maxCollectibleHeight = backgroundMaxY;
 
         gameItemObjectScript.InitGameObjectManager(cameraMaxX, backgroundMinY, backgroundMaxY, NUM_OBSTACLES, NUM_COLLECTIBLES);
 
@@ -469,7 +468,7 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
             int levelNumber = LevelManager.GetCurrentLevel();
             uint activeBirdId = PlayerPrefsCommon.GetActiveBirdId();
 
-            // XXX FirebaseManager.LogPostScoreEvent(score, levelNumber, activeBirdId);
+            FirebaseManager.LogPostScoreEvent(score, levelNumber, activeBirdId);
 
             switch (levelNumber)
             {
@@ -657,10 +656,10 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float coinMaxChance = 1.0f;
         gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                   GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
-                                                  backgroundMinY, backgroundMaxY);
+                                                  minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                 GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
-                                                backgroundMinY, backgroundMaxY);
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level7Prep()
@@ -699,10 +698,10 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float coinMaxChance = 1.0f;
         gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                   GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
-                                                  backgroundMinY, backgroundMaxY);
+                                                  minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                 GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
-                                                backgroundMinY, backgroundMaxY);
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level8Prep()
@@ -769,13 +768,13 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float coinMaxChance = 1.0f;
         gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                   GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
-                                                  backgroundMinY, backgroundMaxY);
+                                                  minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                      GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
-                                                     backgroundMinY, backgroundMaxY);
+                                                     minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                 GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
-                                                backgroundMinY, backgroundMaxY);
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level9Prep()
@@ -854,13 +853,13 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float coinMaxChance = 1.0f;
         gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                   GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
-                                                  backgroundMinY, backgroundMaxY);
+                                                  minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                      GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
-                                                     backgroundMinY, backgroundMaxY);
+                                                     minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                 GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
-                                                backgroundMinY, backgroundMaxY);
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 
     private void Level10Prep()
@@ -961,14 +960,14 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float coinMaxChance = 1.0f;
         gameItemObjectScript.AddBananaCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                   GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, bananaMinChance, bananaMaxChance,
-                                                  backgroundMinY, backgroundMaxY);
+                                                  minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddBlueberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                      GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, blueberryMinChance, blueberryMaxChance,
-                                                     backgroundMinY, backgroundMaxY);
+                                                     minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddStrawberryCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, 1, GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED,
-                                                      strawberryMinChance, strawberryMaxChance, backgroundMinY, backgroundMaxY);
+                                                      strawberryMinChance, strawberryMaxChance, minCollectibleHeight, maxCollectibleHeight);
         gameItemObjectScript.AddCoinCollectible(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,
                                                 GameItemsBehavior.BASE_SPEED, GameItemsBehavior.BASE_SPEED, coinMinChance, coinMaxChance,
-                                                backgroundMinY, backgroundMaxY);
+                                                minCollectibleHeight, maxCollectibleHeight);
     }
 }
