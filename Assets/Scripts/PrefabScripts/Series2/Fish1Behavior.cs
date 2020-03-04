@@ -8,14 +8,18 @@ public class Fish1Behavior : MonoBehaviour
 
     public ObstaclePrefab op;
 
+    public float minHorizontalImpulse = 2.5f;
+    public float maxHorizontalImpulse = 3.0f;
+
+    public float minVerticalImpulse = 9f;
+    public float maxVerticalImpulse = 11f;
+
     private float startY;
     private bool init;
 
     private float horizontalImpulseValue;
     private float verticalImpulseValue;
     private float MAX_GRAVITY_SCALE = 1f;
-
-    private float giveImpulse;
 
     // Start is called before the first frame update
     void Start()
@@ -28,12 +32,6 @@ public class Fish1Behavior : MonoBehaviour
         transform.localPosition = pos;
 
         startY = pos.y;
-
-        float minHorizontalImpulse = 2.5f;
-        float maxHorizontalImpulse = 3.0f;
-
-        float minVerticalImpulse = 9f;
-        float maxVerticalImpulse = 11f;
 
         System.Random sysRandom = new System.Random();
         verticalImpulseValue = (float)(sysRandom.NextDouble() * (maxVerticalImpulse - minVerticalImpulse) + minVerticalImpulse);

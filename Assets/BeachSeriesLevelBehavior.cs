@@ -143,12 +143,6 @@ public class BeachSeriesLevelBehavior : MonoBehaviour
             cameraMaxX = Camera.main.orthographicSize;
         }
 
-        /*
-        Physics2D.IgnoreLayerCollision(9, 10);
-        Physics2D.IgnoreLayerCollision(9, 11);
-        Physics2D.IgnoreLayerCollision(10, 11);
-        */
-
         commonObject = Instantiate(commonPrefab);
         commonScript = commonObject.GetComponent<CommonBehavior>();
 

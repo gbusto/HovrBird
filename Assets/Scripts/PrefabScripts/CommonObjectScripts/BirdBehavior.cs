@@ -105,6 +105,9 @@ public class BirdBehavior : MonoBehaviour
                 changeSpriteTimer = 0f;
             }
         }
+
+        // Rotate the bird based on its velocity
+        rb.rotation = rb.velocity.y * 2f;
     }
 
     private void FixedUpdate()
