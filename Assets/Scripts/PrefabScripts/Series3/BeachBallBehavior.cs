@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BeachBallBehavior : MonoBehaviour
 {
@@ -10,15 +8,9 @@ public class BeachBallBehavior : MonoBehaviour
 
     public ObstaclePrefab op;
 
-    private float xDelta;
-    private float yDelta;
-    private float startY;
-    private float endY;
-    private bool incrementY;
-
     private bool init;
 
-    private float MAX_GRAVITY_SCALE = 0.08f;
+    private float MAX_GRAVITY_SCALE = 0.16f;
 
     // NOTE: Collider needs to start in a disabled state to avoid an initial split-second
     // collision when the obstacle is generated in it's initial (0, 0) world position

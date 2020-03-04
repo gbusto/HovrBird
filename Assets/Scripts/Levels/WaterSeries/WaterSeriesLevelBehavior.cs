@@ -148,6 +148,21 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
             cameraMaxX = (Camera.main.orthographicSize);
         }
 
+        /*
+        // Ignore collision between water and enemy birds
+        Physics2D.IgnoreLayerCollision(4, 9);
+        // Ignore collision between water and fish1
+        Physics2D.IgnoreLayerCollision(4, 10);
+        // Ignore collision between water and fish2
+        Physics2D.IgnoreLayerCollision(4, 11);
+        // Ignore collision between enemy birds and fish1
+        Physics2D.IgnoreLayerCollision(9, 10);
+        // Ignore collision between enemy birds and fish2
+        Physics2D.IgnoreLayerCollision(9, 11);
+        // Ignore collision between fish1 and fish2
+        Physics2D.IgnoreLayerCollision(10, 11);
+        */
+
         commonObject = Instantiate(commonPrefab);
         commonScript = commonObject.GetComponent<CommonBehavior>();
 

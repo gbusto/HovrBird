@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3443748125999870594}
   - component: {fileID: 2493212294495607454}
   - component: {fileID: 2532402024351123968}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KokoPrefab
   m_TagString: Bird
   m_Icon: {fileID: 0}

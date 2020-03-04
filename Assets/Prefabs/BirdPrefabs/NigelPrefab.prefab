@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3752392662938617611}
   - component: {fileID: 1253109756154041813}
   - component: {fileID: 3752392662938617610}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: NigelPrefab
   m_TagString: Bird
   m_Icon: {fileID: 0}

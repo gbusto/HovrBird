@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3130174126124560848}
   - component: {fileID: 2748199880247368140}
   - component: {fileID: 2854961506243283282}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: ToucanPrefab
   m_TagString: Bird
   m_Icon: {fileID: 0}

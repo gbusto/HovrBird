@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5192902545120452951}
   - component: {fileID: 8499955103655381052}
   - component: {fileID: 282941262157150706}
-  m_Layer: 11
+  m_Layer: 8
   m_Name: Football
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -194,4 +194,4 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4

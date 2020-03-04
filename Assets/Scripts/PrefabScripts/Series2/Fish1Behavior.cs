@@ -1,42 +1,44 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Fish1Behavior : MonoBehaviour
 {
+    public Rigidbody2D rigidBody;
     public PolygonCollider2D collider;
     public GameObstacleBehavior gameObstacleScript;
 
     public ObstaclePrefab op;
 
-    private float xDelta;
-    private float yDelta;
     private float startY;
-    private float endY;
-    private bool incrementY;
-
     private bool init;
+
+    private float horizontalImpulseValue;
+    private float verticalImpulseValue;
+    private float MAX_GRAVITY_SCALE = 1f;
+
+    private float giveImpulse;
 
     // Start is called before the first frame update
     void Start()
     {
         op = gameObstacleScript.op;
 
-        xDelta = Random.Range(op.minSpeed, op.maxSpeed);
-
         Vector3 pos = transform.localPosition;
         pos.x = op.startX;
         pos.y = Random.Range(op.minGenY, op.maxGenY);
-        endY = Random.Range(op.minMoveY, op.maxMoveY);
-        startY = pos.y;
         transform.localPosition = pos;
 
-        // Should be determined by size of the object, speed at which
-        // it's moving, and width/height of the screen
-        yDelta = (endY - startY) / 50f;
-        incrementY = true;
+        startY = pos.y;
 
-        transform.rotation = new Quaternion(0, 0, -0.3f, 1.0f);
+        float minHorizontalImpulse = 2.5f;
+        float maxHorizontalImpulse = 3.0f;
+
+        float minVerticalImpulse = 9f;
+        float maxVerticalImpulse = 11f;
+
+        System.Random sysRandom = new System.Random();
+        verticalImpulseValue = (float)(sysRandom.NextDouble() * (maxVerticalImpulse - minVerticalImpulse) + minVerticalImpulse);
+        horizontalImpulseValue = (float)(sysRandom.NextDouble() * (maxHorizontalImpulse - minHorizontalImpulse) + minHorizontalImpulse);
+        rigidBody.AddForce(new Vector2(-1 * horizontalImpulseValue, verticalImpulseValue), ForceMode2D.Impulse);
 
         // Might not be necessary
         init = true;
@@ -52,6 +54,11 @@ public class Fish1Behavior : MonoBehaviour
 
         if (gameObstacleScript.active)
         {
+            if (Mathf.Approximately(rigidBody.gravityScale, 0f))
+            {
+                rigidBody.gravityScale = MAX_GRAVITY_SCALE;
+            }
+
             // Do whatever is needed to move the object
             if (gameObstacleScript.disableColliders && collider.enabled)
             {
@@ -63,34 +70,26 @@ public class Fish1Behavior : MonoBehaviour
             }
 
             Vector3 pos = transform.localPosition;
-            pos.x -= xDelta;
-
-            if (incrementY)
+            if (pos.y <= startY)
             {
-                // Football is ascending
-                pos.y += yDelta;
-                if (pos.y >= endY)
-                {
-                    incrementY = false;
-                    transform.rotation = new Quaternion(0, 0, 0.3f, 1.0f);
-                }
+                // Apply impulse
+                rigidBody.velocity = new Vector2(0, 0);
+                rigidBody.AddForce(new Vector2(-1 * horizontalImpulseValue, verticalImpulseValue), ForceMode2D.Impulse);
             }
-            else
-            {
-                // Football is descending
-                pos.y -= yDelta;
-                if (pos.y <= startY)
-                {
-                    incrementY = true;
-                    transform.rotation = new Quaternion(0, 0, -0.3f, 1.0f);
-                }
-            }
-
-            transform.localPosition = pos;
 
             if (pos.x <= op.endX)
             {
                 gameObstacleScript.cleanup = true;
+            }
+
+            // Rotate the fish based on its velocity
+            rigidBody.rotation = rigidBody.velocity.y * -5f;
+        }
+        else
+        {
+            if (Mathf.Approximately(rigidBody.gravityScale, MAX_GRAVITY_SCALE))
+            {
+                rigidBody.gravityScale = 0f;
             }
         }
     }

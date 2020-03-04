@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3818844347002212773}
   - component: {fileID: 5469904812808384600}
   - component: {fileID: 6864931627870552600}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: blimp2@3x
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
