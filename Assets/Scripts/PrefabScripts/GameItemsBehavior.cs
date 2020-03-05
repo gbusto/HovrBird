@@ -530,7 +530,8 @@ public class GameItemsBehavior : MonoBehaviour
         Direction[] directions =
         {
             Direction.down,
-            Direction.up
+            Direction.up,
+            Direction.none,
         };
 
         ObstaclePrefab op = new ObstaclePrefab();

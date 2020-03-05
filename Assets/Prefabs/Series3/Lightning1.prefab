@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8801183224181853125}
   - component: {fileID: 8801183224181853123}
   - component: {fileID: 8801183224181853124}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Lightning1
   m_TagString: Obstacle
   m_Icon: {fileID: 0}

@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 340884336}
   - component: {fileID: 340884338}
   - component: {fileID: 340884337}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -423,7 +423,7 @@ GameObject:
   - component: {fileID: 1634515284}
   - component: {fileID: 1634515285}
   - component: {fileID: 1634515286}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Ground1
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -792,7 +792,7 @@ GameObject:
   - component: {fileID: 1650372479}
   - component: {fileID: 1650372480}
   - component: {fileID: 1650372481}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Ground2
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -1201,7 +1201,6 @@ MonoBehaviour:
   progressLinePrefab: {fileID: 7590961655731587626, guid: 76e5fb80d9f6e44ed9335e09554077ce,
     type: 3}
   gameItemObject: {fileID: 1339693893}
-  gameItemObjectScript: {fileID: 0}
   gameCamera: {fileID: 1573052313}
   background: {fileID: 340884334}
   finishLinePrefab: {fileID: 6414285918293242451, guid: 9e3996423cb824376b6ef494c9f12128,

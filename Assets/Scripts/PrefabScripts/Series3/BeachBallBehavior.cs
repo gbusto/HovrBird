@@ -1,21 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class BeachBallBehavior : MonoBehaviour
 {
+    public Rigidbody2D rigidBody;
     public PolygonCollider2D collider;
     public GameObstacleBehavior gameObstacleScript;
 
     public ObstaclePrefab op;
 
-    private float xDelta;
-    private float yDelta;
-    private float startY;
-    private float endY;
-    private bool incrementY;
-
     private bool init;
+
+    private float MAX_GRAVITY_SCALE = 0.16f;
 
     // NOTE: Collider needs to start in a disabled state to avoid an initial split-second
     // collision when the obstacle is generated in it's initial (0, 0) world position
@@ -24,19 +19,14 @@ public class BeachBallBehavior : MonoBehaviour
     {
         op = gameObstacleScript.op;
 
-        xDelta = Random.Range(op.minSpeed, op.maxSpeed);
-
         Vector3 pos = transform.localPosition;
         pos.x = op.startX;
         pos.y = Random.Range(op.minGenY, op.maxGenY);
-        endY = Random.Range(op.minMoveY, op.maxMoveY);
-        startY = pos.y;
         transform.localPosition = pos;
 
-        // Should be determined by size of the object, speed at which
-        // it's moving, and width/height of the screen
-        yDelta = (endY - startY) / 100f;
-        incrementY = true;
+        System.Random sysRandom = new System.Random();
+        float verticalImpulse = (float)(sysRandom.NextDouble() * (3f - 1f) + 1f);
+        rigidBody.AddForceAtPosition(new Vector2(-4, verticalImpulse), new Vector2(0, -1), ForceMode2D.Impulse);
 
         // Might not be necessary
         init = true;
@@ -52,6 +42,11 @@ public class BeachBallBehavior : MonoBehaviour
 
         if (gameObstacleScript.active)
         {
+            if (Mathf.Approximately(rigidBody.gravityScale, 0f))
+            {
+                rigidBody.gravityScale = MAX_GRAVITY_SCALE;
+            }
+
             // Do whatever is needed to move the object
             if (gameObstacleScript.disableColliders && collider.enabled)
             {
@@ -63,30 +58,16 @@ public class BeachBallBehavior : MonoBehaviour
             }
 
             Vector3 pos = transform.localPosition;
-            pos.x -= xDelta;
-
-            if (incrementY)
-            {
-                pos.y += yDelta;
-                if (pos.y >= endY)
-                {
-                    incrementY = false;
-                }
-            }
-            else
-            {
-                pos.y -= yDelta;
-                // Object will continue to fall until it's removed from the game
-            }
-
-            transform.localPosition = pos;
-
-            // Rotate the ball continuously
-            transform.Rotate(Vector3.forward * 5);
-
             if (pos.x <= op.endX)
             {
                 gameObstacleScript.cleanup = true;
+            }
+        }
+        else
+        {
+            if (Mathf.Approximately(rigidBody.gravityScale, MAX_GRAVITY_SCALE))
+            {
+                rigidBody.gravityScale = 0f;
             }
         }
     }

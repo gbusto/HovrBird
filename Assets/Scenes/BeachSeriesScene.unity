@@ -354,7 +354,7 @@ GameObject:
   - component: {fileID: 857379265}
   - component: {fileID: 857379266}
   - component: {fileID: 857379267}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -453,7 +453,7 @@ GameObject:
   - component: {fileID: 1184516463}
   - component: {fileID: 1184516465}
   - component: {fileID: 1184516464}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sand2
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
@@ -1112,7 +1112,7 @@ GameObject:
   - component: {fileID: 1517091456}
   - component: {fileID: 1517091458}
   - component: {fileID: 1517091457}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Sand1
   m_TagString: Obstacle
   m_Icon: {fileID: 0}

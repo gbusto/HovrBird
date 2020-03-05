@@ -11,6 +11,9 @@ GameObject:
   - component: {fileID: 8133422495773984226}
   - component: {fileID: 4083987950966589320}
   - component: {fileID: 4738134529382373647}
+  - component: {fileID: -8750507135729701250}
+  - component: {fileID: -541754289062589632}
+  - component: {fileID: 1647649781950914185}
   m_Layer: 8
   m_Name: Fish2
   m_TagString: Obstacle
@@ -88,7 +91,7 @@ PolygonCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5613507286520246920}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -228,3 +231,59 @@ PolygonCollider2D:
       - {x: 3.26, y: -1.355}
       - {x: 3.3, y: -1.235}
       - {x: 3.34, y: -1.0749999}
+--- !u!50 &-8750507135729701250
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613507286520246920}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &-541754289062589632
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613507286520246920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb928803ea2b54ca182162b850aa0f03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _id: 0
+  disableColliders: 0
+  active: 0
+  cleanup: 0
+--- !u!114 &1647649781950914185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5613507286520246920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32b04a6e2aa4140349792aedd614dcaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rigidBody: {fileID: -8750507135729701250}
+  collider: {fileID: 4738134529382373647}
+  gameObstacleScript: {fileID: -541754289062589632}
+  minHorizontalImpulse: 3.5
+  maxHorizontalImpulse: 4
+  minVerticalImpulse: 12
+  maxVerticalImpulse: 13

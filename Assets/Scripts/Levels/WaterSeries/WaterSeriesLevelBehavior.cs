@@ -782,7 +782,7 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         // Add obstacles to the level
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
-        float enemyBirdMinChance = 0.26f;
+        float enemyBirdMinChance = 0.31f;
         float enemyBirdMaxChance = 1.0f;
 
         float waveMinSpeed = 0.07f;
@@ -801,19 +801,28 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float fish1MinMoveY = -4f;
         float fish1MaxMoveY = -2f;
 
+        float fish2MinSpeed = 0.55f;
+        float fish2MaxSpeed = 0.55f;
+        float fish2MinChance = 0.16f;
+        float fish2MaxChance = 0.18f;
+        float fish2MinGenY = -7f;
+        float fish2MaxGenY = -7f;
+        float fish2MinMoveY = -2f;
+        float fish2MaxMoveY = 0f;
+
         float fish3MinSpeed = 0.058f;
         float fish3MaxSpeed = 0.061f;
-        float fish3MinChance = 0.16f;
-        float fish3MaxChance = 0.20f;
-        float fish3MinGenY = -7f;
-        float fish3MaxGenY = -7f;
+        float fish3MinChance = 0.19f;
+        float fish3MaxChance = 0.25f;
+        float fish3MinGenY = -9f;
+        float fish3MaxGenY = -9f;
         float fish3MinMoveY = -3.5f;
         float fish3MaxMoveY = -1.5f;
 
         float boat1MinSpeed = 0.06f;
         float boat1MaxSpeed = 0.07f;
-        float boat1MinChance = 0.21f;
-        float boat1MaxChance = 0.25f;
+        float boat1MinChance = 0.26f;
+        float boat1MaxChance = 0.30f;
         float boat1MinGenY = -4f;
         float boat1MaxGenY = -4f;
         float boat1MinMoveY = -4f;
@@ -824,6 +833,9 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         gameItemObjectScript.AddFish1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish1MinSpeed, fish1MaxSpeed,
                                               fish1MinChance, fish1MaxChance, fish1MinGenY, fish1MaxGenY,
                                               fish1MinMoveY, fish1MaxMoveY);
+        gameItemObjectScript.AddFish2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish2MinSpeed, fish2MaxSpeed,
+                                              fish2MinChance, fish2MaxChance, fish2MinGenY, fish2MaxGenY,
+                                              fish2MinMoveY, fish2MaxMoveY);
         gameItemObjectScript.AddFish3Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish3MinSpeed, fish3MaxSpeed,
                                               fish3MinChance, fish3MaxChance, fish3MinGenY, fish3MaxGenY,
                                               fish3MinMoveY, fish3MaxMoveY);
@@ -867,8 +879,8 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         // Add obstacles to the level
         float sharkMinSpeed = 0.08f;
         float sharkMaxSpeed = 0.10f;
-        float sharkMinChance = 0.26f;
-        float sharkMaxChance = 0.27f;
+        float sharkMinChance = 0.31f;
+        float sharkMaxChance = 0.32f;
         float sharkMinGenY = -18f;
         float sharkMaxGenY = -18f;
         float sharkMinMoveY = -7.5f;
@@ -876,7 +888,7 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
 
         float enemyBirdMinSpeed = 0.05f;
         float enemyBirdMaxSpeed = 0.055f;
-        float enemyBirdMinChance = 0.28f;
+        float enemyBirdMinChance = 0.33f;
         float enemyBirdMaxChance = 1.0f;
 
         float waveMinSpeed = 0.07f;
@@ -895,10 +907,19 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         float fish1MinMoveY = -4f;
         float fish1MaxMoveY = -2f;
 
+        float fish2MinSpeed = 0.55f;
+        float fish2MaxSpeed = 0.55f;
+        float fish2MinChance = 0.16f;
+        float fish2MaxChance = 0.18f;
+        float fish2MinGenY = -9f;
+        float fish2MaxGenY = -9f;
+        float fish2MinMoveY = -2f;
+        float fish2MaxMoveY = 0f;
+
         float fish3MinSpeed = 0.058f;
         float fish3MaxSpeed = 0.061f;
-        float fish3MinChance = 0.16f;
-        float fish3MaxChance = 0.20f;
+        float fish3MinChance = 0.19f;
+        float fish3MaxChance = 0.24f;
         float fish3MinGenY = -7f;
         float fish3MaxGenY = -7f;
         float fish3MinMoveY = -3.5f;
@@ -906,8 +927,8 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
 
         float boat1MinSpeed = 0.06f;
         float boat1MaxSpeed = 0.07f;
-        float boat1MinChance = 0.21f;
-        float boat1MaxChance = 0.25f;
+        float boat1MinChance = 0.25f;
+        float boat1MaxChance = 0.30f;
         float boat1MinGenY = -4f;
         float boat1MaxGenY = -4f;
         float boat1MinMoveY = -4f;
@@ -920,6 +941,9 @@ public class WaterSeriesLevelBehavior : MonoBehaviour
         gameItemObjectScript.AddFish1Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish1MinSpeed, fish1MaxSpeed,
                                               fish1MinChance, fish1MaxChance, fish1MinGenY, fish1MaxGenY,
                                               fish1MinMoveY, fish1MaxMoveY);
+        gameItemObjectScript.AddFish2Obstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish2MinSpeed, fish2MaxSpeed,
+                                      fish2MinChance, fish2MaxChance, fish2MinGenY, fish2MaxGenY,
+                                      fish2MinMoveY, fish2MaxMoveY);
         gameItemObjectScript.AddFish3Obstacle(2, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, fish3MinSpeed, fish3MaxSpeed,
                                               fish3MinChance, fish3MaxChance, fish3MinGenY, fish3MaxGenY,
                                               fish3MinMoveY, fish3MaxMoveY);

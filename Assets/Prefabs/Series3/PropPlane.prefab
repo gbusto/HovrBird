@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6086973101047546703}
   - component: {fileID: 7732261047051163764}
   - component: {fileID: 6325812784603860762}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PropPlane
   m_TagString: Obstacle
   m_Icon: {fileID: 0}

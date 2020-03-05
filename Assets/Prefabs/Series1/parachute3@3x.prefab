@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: -5515959608999462336}
   - component: {fileID: 8170492835978850680}
   - component: {fileID: 3341312836068492954}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: parachute3@3x
   m_TagString: Obstacle
   m_Icon: {fileID: 0}
