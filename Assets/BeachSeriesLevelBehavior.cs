@@ -1024,10 +1024,10 @@ public class BeachSeriesLevelBehavior : MonoBehaviour
         gameItemObjectScript.AddPropPlaneObstacle(1, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL, propPlaneMinSpeed, propPlaneMaxSpeed,
                                                   propPlaneMinChance, propPlaneMaxChance, propPlaneMinGenY, propPlaneMaxGenY,
                                                   propPlaneMinMoveY, propPlaneMaxMoveY);
-        gameItemObjectScript.AddStormCloud1Obstacle(1, 3, stormCloudMinSpeed, stormCloudMaxSpeed,
+        gameItemObjectScript.AddStormCloud1Obstacle(1, 2, stormCloudMinSpeed, stormCloudMaxSpeed,
                                                     stormCloud1MinChance, stormCloud1MaxChance, stormCloudMinGenY, stormCloudMaxGenY,
                                                     stormCloudMinMoveY, stormCloudMaxMoveY);
-        gameItemObjectScript.AddStormCloud2Obstacle(1, 4, stormCloudMinSpeed, stormCloudMaxSpeed,
+        gameItemObjectScript.AddStormCloud2Obstacle(1, 2, stormCloudMinSpeed, stormCloudMaxSpeed,
                                                     stormCloud2MinChance, stormCloud2MaxChance, stormCloudMinGenY, stormCloudMaxGenY,
                                                     stormCloudMinMoveY, stormCloudMaxMoveY);
         gameItemObjectScript.AddEnemyBirdObstacle(GameItemsBehavior.ANY_AMOUNT_IN_SCENE, GameItemsBehavior.ANY_AMOUNT_IN_LEVEL,

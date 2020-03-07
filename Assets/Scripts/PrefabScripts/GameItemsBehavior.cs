@@ -85,6 +85,10 @@ public class GameItemsBehavior : MonoBehaviour
 {
     // All obstacle sprites
     public GameObject enemyBird1Prefab;
+    public GameObject enemyToucanPrefab;
+    public GameObject enemyPelicanPrefab;
+    public GameObject enemySeagullPrefab;
+
     public GameObject blimp1Prefab;
     public GameObject blimp2Prefab;
     public GameObject plane1Prefab;
@@ -534,9 +538,34 @@ public class GameItemsBehavior : MonoBehaviour
             Direction.none,
         };
 
+        uint activeBirdId = PlayerPrefsCommon.GetActiveBirdId();
+        GameObject prefab;
+        switch (activeBirdId)
+        {
+            case InventoryData.KOKO_ID:
+                prefab = enemyBird1Prefab;
+                break;
+
+            case InventoryData.SAM_ID:
+                prefab = enemyToucanPrefab;
+                break;
+
+            case InventoryData.NIGEL_ID:
+                prefab = enemyPelicanPrefab;
+                break;
+
+            case InventoryData.STEVEN_ID:
+                prefab = enemySeagullPrefab;
+                break;
+
+            default:
+                prefab = enemyBird1Prefab;
+                break;
+        }
+
         ObstaclePrefab op = new ObstaclePrefab();
-        op.prefab = enemyBird1Prefab;
-        op.startX = enemyBird1Prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
+        op.prefab = prefab;
+        op.startX = prefab.GetComponent<Renderer>().bounds.max.x + cameraMaxX;
         op.endX = op.startX * -1;
         op.minSpeed = minSpeed;
         op.maxSpeed = maxSpeed;

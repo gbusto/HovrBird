@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1777144405449804666}
   - component: {fileID: 8609393480068490775}
   - component: {fileID: 4213585716481909751}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PalmTree
   m_TagString: Obstacle
   m_Icon: {fileID: 0}

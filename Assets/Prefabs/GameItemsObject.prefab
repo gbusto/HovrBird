@@ -45,6 +45,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyBird1Prefab: {fileID: 7083300218506906694, guid: e6fdd2aad2b784f1bb6fa76f0914621c,
     type: 3}
+  enemyToucanPrefab: {fileID: 2642169540302143689, guid: 466ab903f396942849ebd79fc7e793f3,
+    type: 3}
+  enemyPelicanPrefab: {fileID: 1861403722331938565, guid: 312a09c6604604fbda0f8178b7af1d53,
+    type: 3}
+  enemySeagullPrefab: {fileID: 7756799797828439919, guid: cec40ed55bc7e41a1836d26de1b0205d,
+    type: 3}
   blimp1Prefab: {fileID: 3626431465691020300, guid: be9190b8d502048a1995e765a0a244ca,
     type: 3}
   blimp2Prefab: {fileID: 4436920792305393264, guid: 0f000bf314b834b91b1f0ddb501dfb50,
@@ -103,3 +109,8 @@ MonoBehaviour:
     type: 3}
   strawberryPrefab: {fileID: 7339276150818028654, guid: 3152adab802074431a078dc21fd2a040,
     type: 3}
+  gameObstacles: []
+  gameObstacleIndices: 
+  gameCollectibles: []
+  gameCollectibleIndices: 
+  active: 0
