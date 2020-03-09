@@ -546,7 +546,15 @@ public class GameItemsBehavior : MonoBehaviour
                 prefab = enemyBird1Prefab;
                 break;
 
+            case InventoryData.ANGRY_KOKO_ID:
+                prefab = enemyBird1Prefab;
+                break;
+
             case InventoryData.SAM_ID:
+                prefab = enemyToucanPrefab;
+                break;
+
+            case InventoryData.ANGRY_SAM_ID:
                 prefab = enemyToucanPrefab;
                 break;
 
@@ -554,7 +562,15 @@ public class GameItemsBehavior : MonoBehaviour
                 prefab = enemyPelicanPrefab;
                 break;
 
+            case InventoryData.ANGRY_NIGEL_ID:
+                prefab = enemyPelicanPrefab;
+                break;
+
             case InventoryData.STEVEN_ID:
+                prefab = enemySeagullPrefab;
+                break;
+
+            case InventoryData.ANGRY_STEVEN_ID:
                 prefab = enemySeagullPrefab;
                 break;
 

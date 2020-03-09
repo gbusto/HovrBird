@@ -164,7 +164,17 @@ public class BirdPanelBehavior : MonoBehaviour
 
         switch (birdId)
         {
+            case InventoryData.ANGRY_KOKO_ID:
+                // XXX Make a video clip for angry Koko hatching
+                videoPlayer.clip = samHatchingVideoClip;
+                break;
+
             case InventoryData.SAM_ID:
+                videoPlayer.clip = samHatchingVideoClip;
+                break;
+
+            case InventoryData.ANGRY_SAM_ID:
+                // XXX Make a video clip for angry Sam hatching
                 videoPlayer.clip = samHatchingVideoClip;
                 break;
 
@@ -172,7 +182,17 @@ public class BirdPanelBehavior : MonoBehaviour
                 videoPlayer.clip = nigelHatchingVideoClip;
                 break;
 
+            case InventoryData.ANGRY_NIGEL_ID:
+                // XXX Make a video clip for angry Nigel hatching
+                videoPlayer.clip = nigelHatchingVideoClip;
+                break;
+
             case InventoryData.STEVEN_ID:
+                videoPlayer.clip = stevenHatchingVideoClip;
+                break;
+
+            case InventoryData.ANGRY_STEVEN_ID:
+                // XXX Make a video clip for angry Steven hatching
                 videoPlayer.clip = stevenHatchingVideoClip;
                 break;
 

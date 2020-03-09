@@ -144,11 +144,19 @@ MonoBehaviour:
   hintMessageCanvas: {fileID: 8416028519350466594}
   kokoPrefab: {fileID: 866947939758040446, guid: 9d886b220b46b4a749b38438eff4e5b2,
     type: 3}
+  angryKokoPrefab: {fileID: 2867003969712775819, guid: 3959926a2c7714e8083125220a8273b0,
+    type: 3}
   samPrefab: {fileID: 626632475567629868, guid: 153369d1c75e247ad835849d0d8d28f1,
+    type: 3}
+  angrySamPrefab: {fileID: 8590159624423175376, guid: 5ab9c8660163c4e81978577b59477ec9,
     type: 3}
   nigelPrefab: {fileID: 3752392662938617608, guid: e76ec04c8572b4b83a531b00ae0406a2,
     type: 3}
+  angryNigelPrefab: {fileID: 2999379082899184785, guid: 3af33b84dda3f44019e22fcf0ea89d8f,
+    type: 3}
   stevenPrefab: {fileID: 7237120390437980799, guid: a97c33bc0fff54ac5a74d9432db2cdb6,
+    type: 3}
+  angryStevenPrefab: {fileID: 4535319752457251759, guid: 67cec3d135dd144e3abbe97422faf4c9,
     type: 3}
   disableColliders: 0
   levelChanger: {fileID: 6914358278458078921}

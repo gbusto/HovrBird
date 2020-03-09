@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using GoogleMobileAds.Api;
 using UnityEngine;
+
+/* NOTE:
+ *
+ * Apple is not currently and will not accept my game for iOS. So I have removed
+ * most/all code for preparing ads for iOS devices.
+ */
 
 public class AdManager
 {
@@ -13,11 +17,23 @@ public class AdManager
     private static bool rewardAdIsReady;
     private static bool useTestAds;
 
+    private const string BANNER_AD_TEST_ID = "ca-app-pub-3940256099942544/6300978111";
+    private const string ANDROID_BANNER_AD_LEVELS_ID = "ca-app-pub-4215818305477568/6510880295";
+    private const string IOS_BANNER_AD_LEVELS_ID = "ca-app-pub-4215818305477568/4527355999";
+
+    private const string INTERSTITIAL_AD_TEST_ID = "ca-app-pub-3940256099942544/1033173712";
+    private const string IOS_INTERSTITIAL_AD_LEVELS_ID = "ca-app-pub-4215818305477568/4801375080";
+    private const string ANDROID_INTERSTITIAL_AD_LEVELS_ID = "ca-app-pub-4215818305477568/2039769350";
+
+    private const string REWARD_AD_TEST_ID = "ca-app-pub-3940256099942544/1712485313";
+    private const string IOS_REWARD_AD_RESCUE_USER_ID = "ca-app-pub-4215818305477568/7044395043";
+    private const string ANDROID_REWARD_AD_RESCUE_USER_ID = "ca-app-pub-4215818305477568/8030462638";
+    private const string ANDROID_REWARD_AD_THREE_LIVES_ID = "ca-app-pub-4215818305477568/9879467987";
+
     protected AdManager()
     {
 
     }
-
 
     /*
      * Public ad functions
@@ -96,6 +112,24 @@ public class AdManager
         rewardAdBeingLoaded = false;
     }
 
+    public bool IsSupportedPlatform()
+    {
+        if (useTestAds)
+        {
+#if UNITY_EDITOR
+            return false;
+#else
+            return true;
+#endif
+        }
+
+#if UNITY_ANDROID
+        return true;
+#else
+        return false;
+#endif
+    }
+
 
     /*
      * Private ad functions
@@ -126,15 +160,12 @@ public class AdManager
         if (useTestAds)
         {
             // Return the test banner ad unit ID
-            return "ca-app-pub-3940256099942544/6300978111";
+            return BANNER_AD_TEST_ID;
         }
 
 #if UNITY_ANDROID
         // Return the Android banner ad unit ID
-        return "ca-app-pub-4215818305477568/6510880295";
-#elif UNITY_IOS
-        // Return the iOS banner ad unit ID
-        return "ca-app-pub-4215818305477568/4527355999";
+        return ANDROID_BANNER_AD_LEVELS_ID;
 #endif
         return "";
     }
@@ -144,18 +175,14 @@ public class AdManager
         if (useTestAds)
         {
             // Return the test interstitial ad unit ID
-            return "ca-app-pub-3940256099942544/1033173712";
+            return INTERSTITIAL_AD_TEST_ID;
         }
 
 #if UNITY_ANDROID
         // Return the Android banner ad unit ID
-        return "ca-app-pub-4215818305477568/2039769350";
-#elif UNITY_IOS
-        // Return the iOS banner ad unit ID
-        return "ca-app-pub-4215818305477568/4801375080";
+        return ANDROID_INTERSTITIAL_AD_LEVELS_ID;
 #endif
         return "";
-
     }
 
     private string GetRewardAdUnitId()
@@ -163,21 +190,13 @@ public class AdManager
         if (useTestAds)
         {
             // Return the test reward ad unit ID
-            return "ca-app-pub-3940256099942544/1712485313";
+            return REWARD_AD_TEST_ID;
         }
 
 #if UNITY_ANDROID
-        // Return the Android banner ad unit ID
-        return "ca-app-pub-4215818305477568/8030462638";
-#elif UNITY_IOS
-        // Return the iOS banner ad unit ID
-        return "ca-app-pub-4215818305477568/7044395043";
+        // Return the Android reward ad unit ID; switching the reward ad for this function to the 3 lives reward
+        return ANDROID_REWARD_AD_THREE_LIVES_ID;
 #endif
         return "";
-    }
-
-    private void print(string message)
-    {
-        MonoBehaviour.print(message);
     }
 }

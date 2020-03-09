@@ -15,21 +15,27 @@ public class InventoryCanvasBehavior : MonoBehaviour
     public Canvas nestedInventoryCanvas;
     public Canvas nestedBirdCanvas;
 
+    public Sprite heartSprite;
     public Sprite coinSprite;
     public Sprite bananaSprite;
     public Sprite blueberrySprite;
     public Sprite strawberrySprite;
 
     // Collectible inventory stuff
+    public Text lifeCountText;
     public Text coinCountText;
     public Text bananaCountText;
     public Text blueberriesCountText;
     public Text strawberryCountText;
 
     public Sprite kokoSprite;
+    public Sprite angryKokoSprite;
     public Sprite samSprite;
+    public Sprite angrySamSprite;
     public Sprite nigelSprite;
+    public Sprite angryNigelSprite;
     public Sprite stevenSprite;
+    public Sprite angryStevenSprite;
 
     public GameObject notificationCanvasPrefab;
     private GameObject itemsNotification;
@@ -170,6 +176,7 @@ public class InventoryCanvasBehavior : MonoBehaviour
         itemsTabButton.colors = colors;
         birdTabButton.image.color = originalButtonColor;
 
+        lifeCountText.text = "x" + inventoryData.livesCount;
         coinCountText.text = "x" + inventoryData.collectibleDict[InventoryData.coinKey].ToString();
         bananaCountText.text = "x" + inventoryData.collectibleDict[InventoryData.bananaKey].ToString();
         blueberriesCountText.text = "x" + inventoryData.collectibleDict[InventoryData.blueberryKey].ToString();
@@ -201,14 +208,26 @@ public class InventoryCanvasBehavior : MonoBehaviour
             case InventoryData.KOKO_ID:
                 return kokoSprite;
 
+            case InventoryData.ANGRY_KOKO_ID:
+                return angryKokoSprite;
+
             case InventoryData.SAM_ID:
                 return samSprite;
+
+            case InventoryData.ANGRY_SAM_ID:
+                return angrySamSprite;
 
             case InventoryData.NIGEL_ID:
                 return nigelSprite;
 
+            case InventoryData.ANGRY_NIGEL_ID:
+                return angryNigelSprite;
+
             case InventoryData.STEVEN_ID:
                 return stevenSprite;
+
+            case InventoryData.ANGRY_STEVEN_ID:
+                return angryStevenSprite;
         }
 
         return null;
@@ -221,14 +240,26 @@ public class InventoryCanvasBehavior : MonoBehaviour
             case InventoryData.KOKO_ID:
                 return "Koko";
 
+            case InventoryData.ANGRY_KOKO_ID:
+                return "Angry Koko";
+
             case InventoryData.SAM_ID:
                 return "Sam";
+
+            case InventoryData.ANGRY_SAM_ID:
+                return "Angry Sam";
 
             case InventoryData.NIGEL_ID:
                 return "Nigel";
 
+            case InventoryData.ANGRY_NIGEL_ID:
+                return "Angry Nigel";
+
             case InventoryData.STEVEN_ID:
                 return "Steven";
+
+            case InventoryData.ANGRY_STEVEN_ID:
+                return "Angry Steven";
         }
 
         return "";
@@ -245,40 +276,6 @@ public class InventoryCanvasBehavior : MonoBehaviour
             spriteReqList.Add((s, pair.Value));
         }
         return spriteReqList;
-
-        /* XXX REMOVE ME
-        switch (id)
-        {
-            case InventoryData.SAM_ID:
-                return new List<(Sprite, int)>()
-                {
-                    (coinSprite, InventoryData.samRequirements[InventoryData.coinKey]),
-                    (bananaSprite, InventoryData.samRequirements[InventoryData.bananaKey]),
-                    (blueberrySprite, InventoryData.samRequirements[InventoryData.blueberryKey]),
-                    (strawberrySprite, InventoryData.samRequirements[InventoryData.strawberryKey])
-                };
-
-            case InventoryData.NIGEL_ID:
-                return new List<(Sprite, int)>()
-                {
-                    (coinSprite, InventoryData.nigelRequirements[InventoryData.coinKey]),
-                    (bananaSprite, InventoryData.nigelRequirements[InventoryData.bananaKey]),
-                    (blueberrySprite, InventoryData.nigelRequirements[InventoryData.blueberryKey]),
-                    (strawberrySprite, InventoryData.nigelRequirements[InventoryData.strawberryKey])
-                };
-
-            case InventoryData.STEVEN_ID:
-                return new List<(Sprite, int)>()
-                {
-                    (coinSprite, InventoryData.stevenRequirements[InventoryData.coinKey]),
-                    (bananaSprite, InventoryData.stevenRequirements[InventoryData.bananaKey]),
-                    (blueberrySprite, InventoryData.stevenRequirements[InventoryData.blueberryKey]),
-                    (strawberrySprite, InventoryData.stevenRequirements[InventoryData.strawberryKey])
-                };
-        }
-
-        return new List<(Sprite, int)>();
-        */
     }
 
     private Sprite GetCollectibleSpriteForKey(string key)

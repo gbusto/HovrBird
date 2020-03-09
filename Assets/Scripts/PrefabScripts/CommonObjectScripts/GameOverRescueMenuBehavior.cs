@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 public class GameOverRescueMenuBehavior : MonoBehaviour
 {
+    /* XXX REMOVE ME? IS THIS BEING USED ANYMORE?
     public Button gameOverRescueContinueButton;
     public Button gameOverRescueNoThanksButton;
 
@@ -27,4 +28,5 @@ public class GameOverRescueMenuBehavior : MonoBehaviour
     {
         commonScript.RescueDontContinueGame();
     }
+    */
 }

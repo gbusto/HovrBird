@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/BeachSeriesScene.unity
     guid: 0f506121245ee4943ae73082c66f524b
+  - enabled: 1
+    path: Assets/Scenes/StoreScene.unity
+    guid: d29a41e4cd10b4a95b99a925d5a06d43
   m_configObjects: {}

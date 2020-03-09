@@ -206,7 +206,7 @@ GameObject:
   - component: {fileID: 5501910201854586123}
   - component: {fileID: 2201345420046283192}
   m_Layer: 5
-  m_Name: RescueCoinText
+  m_Name: RescueHeartText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -270,7 +270,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: x10
+  m_Text: x1
 --- !u!1 &4319119606388291247
 GameObject:
   m_ObjectHideFlags: 0
@@ -498,6 +498,7 @@ RectTransform:
   - {fileID: 2708737168737920657}
   - {fileID: 2145501588237160205}
   - {fileID: 1611315151063726139}
+  - {fileID: 3672372529488889781}
   m_Father: {fileID: 2019530204270874559}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -574,7 +575,6 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 4021422087386954713}
-  - {fileID: 3672372529488889781}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -657,7 +657,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rescueBackgroundImage: {fileID: 7531563806155933338}
   messageText: {fileID: 2317595698248332221}
-  coinCostText: {fileID: 2201345420046283192}
+  rescueHeartText: {fileID: 2201345420046283192}
   yesButton: {fileID: 2835361498104709398}
   dismissButton: {fileID: 8607236137233103914}
   rescueWarningImage: {fileID: 1433064888459805194}
@@ -673,7 +673,7 @@ GameObject:
   - component: {fileID: 4779435760079728281}
   - component: {fileID: 5593766809058102157}
   m_Layer: 5
-  m_Name: RescueCoinImage
+  m_Name: RescueHeartImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -725,7 +725,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 24027a1844ff04062818136d4602334b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3ee31228353724af790ab1719abae09b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -760,14 +760,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8709186961825914465}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8142236827343826502}
   - {fileID: 7075930571465914134}
-  m_Father: {fileID: 2019530204270874559}
-  m_RootOrder: 1
+  m_Father: {fileID: 4021422087386954713}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}

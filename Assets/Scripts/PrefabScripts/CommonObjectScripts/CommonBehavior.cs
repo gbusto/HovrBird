@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using GoogleMobileAds.Api;
 
 public class CommonBehavior : MonoBehaviour
 {
@@ -82,9 +79,13 @@ public class CommonBehavior : MonoBehaviour
     // Rename to gameBird when it changes to a bird
     // We get this from InventoryData now
     public GameObject kokoPrefab;
+    public GameObject angryKokoPrefab;
     public GameObject samPrefab;
+    public GameObject angrySamPrefab;
     public GameObject nigelPrefab;
+    public GameObject angryNigelPrefab;
     public GameObject stevenPrefab;
+    public GameObject angryStevenPrefab;
 
     private GameObject birdObject;
     private BirdBehavior birdScript;
@@ -108,152 +109,15 @@ public class CommonBehavior : MonoBehaviour
 
     private bool newHighScore;
 
-    private const int RESCUE_COIN_COUNT = 10;
-
-
-    #region GoogleAds
-    /*
-     * Google Ad stuff
-     */
-    private BannerView bannerView;
-    private InterstitialAd interstitialAd;
-    private RewardedAd rewardAd;
-    private bool rewardUser;
-    private readonly int interstitialThreshold = 3;
-
-    // This needs to be set to false to enable real ads
-    private readonly bool TESTING = true;
-
     private NotificationManager notificationMgr;
 
     private int currentLevelNumber;
 
-    private void InitializeAdTypes()
-    {
-#if UNITY_ANDROID || UNITY_IOS
-        AdManager.Initialize(TESTING);
-#endif
-
-        // Load the banner ad
-        bannerView = AdManager.instance.GetBannerView();
-        // Ads: Hide banner view here
-
-        // Load the interstitial ad
-        InitializeInterstitialAd();
-
-        // Load the reward ad
-        InitializeRewardAd();
-    }
-
-
-    /*
-     * Interstitial ad functions
-     */
-    private void InitializeInterstitialAd()
-    {
-        // This will always need to be reinitialized
-        interstitialAd = AdManager.instance.GetInterstitialAd();
-
-        // Called when user closes an interstitial ad
-        interstitialAd.OnAdClosed += HandleInterstitialAdClosed;
-
-    }
-
-    public void HandleInterstitialAdClosed(object sender, EventArgs args)
-    {
-        // Interstitial ad ended; reload the scene now
-        levelChangerScript.FadeToSameScene();
-    }
-
-    private void UnsubscribeInterstitialAdEvents()
-    {
-        interstitialAd.OnAdClosed -= HandleInterstitialAdClosed;
-    }
-
-
-    /*
-     * Reward ad functions
-     */
-    private void InitializeRewardAd()
-    {
-        rewardAd = AdManager.instance.GetRewardAd();
-
-        // Called when the user should be rewarded for interacting with the ad.
-        rewardAd.OnUserEarnedReward += HandleUserEarnedReward;
-        // Called when the ad is closed.
-        rewardAd.OnAdClosed += HandleRewardAdClosed;
-
-        rewardAd.OnAdFailedToLoad += HandleRewardAdLoadFailed;
-    }
-
-    private void UnsubscribeRewardAdEvents()
-    {
-        rewardAd.OnUserEarnedReward -= HandleUserEarnedReward;
-        rewardAd.OnAdClosed -= HandleRewardAdClosed;
-        rewardAd.OnAdFailedToLoad -= HandleRewardAdLoadFailed;
-    }
-
-    public void HandleRewardAdLoadFailed(object sender, AdErrorEventArgs args)
-    {
-        /*
-        if (Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork ||
-            Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork)
-        {
-            // Don't do anything if the network is still accessible
-            return;
-        }
-
-        // If the network is inaccessible, notify the user
-        if (Application.internetReachability == NetworkReachability.NotReachable)
-        {
-            playCanvasScript.heartImage.sprite = playCanvasScript.noLifeSprite;
-            userWasRescued = true;
-
-            if (false == PlayerPrefsCommon.GetUserIsOffline())
-            {
-                string message = "It seems you're offline. You won't be able to rescue yourself after hitting an obstacle until you're back online.";
-                hintMessageCanvasScript.dismissHintButton.onClick.AddListener(DismissUserIsOfflinePopup);
-                hintMessageCanvasScript.ShowMessage(message);
-            }
-        }
-        */
-    }
-
-    private void DismissUserIsOfflinePopup()
-    {
-        PlayerPrefsCommon.SetUserIsOffline(true);
-        hintMessageCanvasScript.dismissHintButton.onClick.RemoveListener(DismissUserIsOfflinePopup);
-    }
-
-    public void HandleRewardAdClosed(object sender, EventArgs args)
-    {
-        // Don't need to load a new reward ad here, wait until the level restarts
-        if (rewardUser)
-        {
-            // Reset the variable here
-            rewardUser = false;
-            RescueContinueGame();
-        }
-        else
-        {
-            RescueDontContinueGame();
-        }
-    }
-
-    public void HandleUserEarnedReward(object sender, Reward args)
-    {
-        rewardUser = true;
-    }
-
-    /*
-     * End of Google Ad stuff
-     */
-    #endregion
-
-
 
     void Awake()
     {
+        InventoryData inventoryData = InventoryData.Instance();
+
         currentLevelNumber = LevelManager.GetCurrentLevel();
 
         activeBirdId = PlayerPrefsCommon.GetActiveBirdId();
@@ -307,9 +171,13 @@ public class CommonBehavior : MonoBehaviour
             Vector3 newPos = footerButtonsScript.inventoryButton.transform.localPosition;
             playCanvasScript.pauseButton.transform.localPosition = newPos;
         }
+
+        int lifeCount = inventoryData.GetLifeCount();
+
         // Add code to deactivate pause button when another menu is showing
         playCanvasScript.pauseButton.onClick.AddListener(pauseButtonClicked);
         playCanvasScript.heartImage.sprite = playCanvasScript.fullLifeSprite;
+        playCanvasScript.lifeCountText.text = "x" + lifeCount.ToString();
         playCanvas.gameObject.SetActive(false);
 
         pauseMenu = Instantiate(pauseMenuPrefab);
@@ -330,10 +198,9 @@ public class CommonBehavior : MonoBehaviour
 
         rescueCanvas = Instantiate(rescueCanvasPrefab);
         rescueCanvasScript = rescueCanvas.GetComponent<RescueCanvasBehavior>();
-        // Ads: Change line below to make the onClick function ShowRewardAd instead of RescueUser
         rescueCanvasScript.yesButton.onClick.AddListener(RescueUser);
         rescueCanvasScript.dismissButton.onClick.AddListener(RescueDontContinueGame);
-        rescueCanvasScript.coinCostText.text = "x" + RESCUE_COIN_COUNT.ToString();
+        rescueCanvasScript.rescueHeartText.text = "x1";
         rescueCanvas.gameObject.SetActive(false);
 
         gameOverCanvas = Instantiate(gameOverCanvasPrefab);
@@ -407,7 +274,6 @@ public class CommonBehavior : MonoBehaviour
             }
         }
 
-        InventoryData inventoryData = InventoryData.Instance();
         LevelData levelData = LevelData.Instance();
         reviewCanvas.gameObject.SetActive(false);
         if (false == PlayerPrefsCommon.GetReviewPrompt1())
@@ -513,13 +379,12 @@ public class CommonBehavior : MonoBehaviour
     private void OnApplicationQuit()
     {
         notificationMgr.SaveUserData();
+        InventoryData.Instance().SaveUserData();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        // Ads: Initialize ads here if needed
-
         if (null != cameraScript)
         {
             if (false == cameraScript.moveWithBird)
@@ -735,17 +600,6 @@ public class CommonBehavior : MonoBehaviour
     {
         LevelManager.SetLevelNumber(currentLevelNumber + 1);
 
-        /*
-        if (interstitialAd.IsLoaded() && (totalAttempts % interstitialThreshold == 0))
-        {
-            interstitialAd.Show();
-        }
-        else
-        {
-            FadeToSameScene();
-        }
-        */
-
         FadeToNextLevel();
     }
 
@@ -779,8 +633,6 @@ public class CommonBehavior : MonoBehaviour
         DismissStartMenu();
         DismissPauseMenu();
 
-        // Ads: Show banner ad here
-
         FirebaseManager.LogLevelStartEvent(currentLevelNumber);
     }
 
@@ -798,13 +650,7 @@ public class CommonBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
-        /* Ads: Uncomment these if ads are re-enabled
-        UnsubscribeInterstitialAdEvents();
-        UnsubscribeRewardAdEvents();
 
-        bannerView.Destroy();
-        interstitialAd.Destroy();
-        */
     }
 
     public string GetLastCollisionTag()
@@ -820,47 +666,24 @@ public class CommonBehavior : MonoBehaviour
     public bool CanShowRescueCanvas()
     {
         InventoryData iData = InventoryData.Instance();
-        return iData.collectibleDict[InventoryData.coinKey] >= RESCUE_COIN_COUNT;
+
+        // XXX May need to warn the user that lives are limited..
+        return iData.UserCanBeRescued();
     }
 
     public void RescueUser()
     {
         InventoryData inventoryData = InventoryData.Instance();
-        int coinCount = inventoryData.collectibleDict[InventoryData.coinKey];
-        if (coinCount >= RESCUE_COIN_COUNT)
-        {
-            Dictionary<string, int> dict = new Dictionary<string, int>
-            {
-                [InventoryData.coinKey] = RESCUE_COIN_COUNT
-            };
-            inventoryData.SpendCurrency(dict, FirebaseManager.CURRENCY_SPEND_RESCUE_USER);
-        }
+
+        // Use one of the user's lives
+        inventoryData.RescueUser();
+        playCanvasScript.lifeCountText.gameObject.SetActive(false);
 
         RescueContinueGame();
-    }
-
-    public void ShowRewardAd()
-    {
-#if UNITY_EDITOR
-        rewardUser = false;
-        RescueContinueGame();
-#else
-        if (rewardAd.IsLoaded())
-        {
-            rewardAd.Show();
-        }
-        else
-        {
-            // If the ad isn't loaded, just go straight to the end of the game
-            RescueDontContinueGame();
-        }
-#endif
     }
 
     public void RescueContinueGame()
     {
-        // Continue game after user watches an ad
-
         // Allow game object to go through game obstacles temporarily and "blink"
         birdScript.Rescued();
 
@@ -901,14 +724,13 @@ public class CommonBehavior : MonoBehaviour
 
             totalAttempts += 1;
 
-            Time.timeScale = 1f;
+            // XXX REMOVE ME Time.timeScale = 1f;
             state = GameState.Win;
 
             birdScript.RemoveAllCollisionTags();
         }
         else
         {
-            // Ads: Check if reward ad is loaded before showing rescue canvas
             if (false == userWasRescued && CanShowRescueCanvas())
             {
                 StopGame();
@@ -924,7 +746,7 @@ public class CommonBehavior : MonoBehaviour
 
                 totalAttempts += 1;
 
-                Time.timeScale = 1f;
+                // XXX REMOVE ME Time.timeScale = 1f;
                 state = GameState.Loss;
 
                 birdScript.RemoveAllCollisionTags();
@@ -941,41 +763,29 @@ public class CommonBehavior : MonoBehaviour
     public void RestartGame()
     {
         FadeToSameScene();
-
-        /*
-#if UNITY_EDITOR
-        FadeToSameScene();
-#else
-        // Show interstitial ad here
-        if (interstitialAd.IsLoaded() && (totalAttempts % interstitialThreshold == 0))
-        {
-            interstitialAd.Show();
-        }
-        else
-        {
-            FadeToSameScene();
-        }
-#endif
-        */
     }
 
     public void FadeToNextLevel()
     {
+        Time.timeScale = 1f;
         levelChangerScript.FadeToNextLevel();
     }
 
     public void FadeToSameScene()
     {
+        Time.timeScale = 1f;
         levelChangerScript.FadeToSameScene();
     }
 
     public void FadeToScene(string sceneName)
     {
+        Time.timeScale = 1f;
         levelChangerScript.FadeToScene(sceneName);
     }
 
     public void FadeToPreviousScene()
     {
+        Time.timeScale = 1f;
         levelChangerScript.FadeToPreviousScene();
     }
 
@@ -992,15 +802,27 @@ public class CommonBehavior : MonoBehaviour
             case InventoryData.KOKO_ID:
                 return kokoPrefab;
 
+            case InventoryData.ANGRY_KOKO_ID:
+                return angryKokoPrefab;
+
             case InventoryData.SAM_ID:
                 // Validate with InventoryData to ensure the user actually has access to this
                 return samPrefab;
 
+            case InventoryData.ANGRY_SAM_ID:
+                return angrySamPrefab;
+
             case InventoryData.NIGEL_ID:
                 return nigelPrefab;
 
+            case InventoryData.ANGRY_NIGEL_ID:
+                return angryNigelPrefab;
+
             case InventoryData.STEVEN_ID:
                 return stevenPrefab;
+
+            case InventoryData.ANGRY_STEVEN_ID:
+                return angryStevenPrefab;
 
             default:
                 PlayerPrefsCommon.SetActiveBirdId(InventoryData.KOKO_ID);
@@ -1096,8 +918,6 @@ public class CommonBehavior : MonoBehaviour
     private void ShowFooterButtons()
     {
         footerMenuCanvas.gameObject.SetActive(true);
-
-        // Ads: Hide banner ad here
     }
 
     private void DismissStartMenu()

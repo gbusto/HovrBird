@@ -20,6 +20,8 @@ public class GameMenuBehavior : MonoBehaviour
     public Button getAllCollectibles;
 #endif
 
+    public Button storeButton;
+
     public Button inventoryButton;
 
     public Button contactButton;
@@ -107,6 +109,7 @@ public class GameMenuBehavior : MonoBehaviour
         classicButton.onClick.AddListener(ClassicButtonClicked);
         adventureButton.onClick.AddListener(AdventureButtonClicked);
         inventoryButton.onClick.AddListener(InventoryButtonClicked);
+        storeButton.onClick.AddListener(StoreButtonClicked);
 
         contactButton.onClick.AddListener(ShowContactPopup);
         contactCanvasEmailButton.onClick.AddListener(EmailButtonClicked);
@@ -179,6 +182,11 @@ public class GameMenuBehavior : MonoBehaviour
                                            NotificationManager.CLEAR_NOTIFICATION);
 
         inventoryCanvas.gameObject.SetActive(true);
+    }
+
+    public void StoreButtonClicked()
+    {
+        levelChangerScript.FadeToScene("StoreScene");
     }
 
     private void InventoryCanvasDismissed()

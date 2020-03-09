@@ -25,7 +25,8 @@ public static class NativeMobileStoragePostProcess
             var proj = new PBXProject();
             proj.ReadFromFile(projPath);
 
-            var targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            //var targetGuid = proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            var targetGuid = proj.GetUnityFrameworkTargetGuid();
 
 
             proj.SetBuildProperty(targetGuid, "ENABLE_BITCODE", "NO");
