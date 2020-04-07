@@ -148,6 +148,7 @@ public class CommonBehavior : MonoBehaviour
         footerMenuCanvas = Instantiate(footerMenuPrefab);
         footerButtonsScript = footerMenuCanvas.GetComponent<FooterButtonsBehavior>();
         footerButtonsScript.exitButton.onClick.AddListener(FadeToPreviousScene);
+        footerButtonsScript.storeButton.onClick.AddListener(StoreButtonClicked);
         // Inventory footer button click listener is being set in FooterButtonsBehavior
         footerButtonsScript.inventoryButton.onClick.AddListener(InventoryButtonClicked);
 
@@ -331,6 +332,11 @@ public class CommonBehavior : MonoBehaviour
     {
         PlayerPrefsCommon.SetRareFruitNew(true);
         hintMessageCanvasScript.dismissHintButton.onClick.RemoveListener(DismissRareFruitPopupClicked);
+    }
+
+    private void StoreButtonClicked()
+    {
+        levelChangerScript.FadeToScene("StoreScene");
     }
 
     private void InventoryButtonClicked()
@@ -904,7 +910,7 @@ public class CommonBehavior : MonoBehaviour
             playCanvasScript.pauseButton.gameObject.SetActive(false);
         }
 
-        ShowFooterButtons();
+        ShowFooterButtons(hideStoreButton:true);
     }
 
     private void ShowPauseMenu()
@@ -912,12 +918,21 @@ public class CommonBehavior : MonoBehaviour
         playCanvas.SetActive(false);
 
         pauseMenu.gameObject.SetActive(true);
-        ShowFooterButtons();
+        ShowFooterButtons(hideStoreButton:true);
     }
 
-    private void ShowFooterButtons()
+    private void ShowFooterButtons(bool hideStoreButton = false)
     {
         footerMenuCanvas.gameObject.SetActive(true);
+
+        if (hideStoreButton)
+        {
+            footerButtonsScript.storeButton.gameObject.SetActive(false);
+        }
+        else
+        {
+            footerButtonsScript.storeButton.gameObject.SetActive(true);
+        }
     }
 
     private void DismissStartMenu()

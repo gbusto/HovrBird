@@ -11,10 +11,6 @@ public class StoreBehavior : MonoBehaviour
     public GameObject adObject;
     private AdObjectBehavior adObjectScript;
 
-    public Canvas footerButtonCanvas;
-    public Button exitButton;
-    public Button inventoryButton;
-
     public Canvas portraitCanvas;
     public Canvas landscapeCanvas;
 
@@ -24,6 +20,8 @@ public class StoreBehavior : MonoBehaviour
     public GameObject levelChanger;
     private LevelChanger levelChangerScript;
 
+    public Button landscapeBackButton;
+    public Button landscapeInventoryButton;
     public Button landscapeCoinIAP1Button;
     public Text landscapeCoinIAP1PriceText;
     public Button landscapeCoinIAP2Button;
@@ -43,6 +41,8 @@ public class StoreBehavior : MonoBehaviour
     public Button landscapeBirdIAP4Button;
     public Text landscapeBirdIAP4PriceText;
 
+    public Button portraitBackButton;
+    public Button portraitInventoryButton;
     public Button portraitCoinIAP1Button;
     public Text portraitCoinIAP1PriceText;
     public Button portraitCoinIAP2Button;
@@ -123,9 +123,6 @@ public class StoreBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        footerButtonCanvas.gameObject.SetActive(true);
-        exitButton.onClick.AddListener(ReturnToMenuButtonClicked);
-        inventoryButton.onClick.AddListener(InventoryButtonClicked);
         inventoryDismissButton.onClick.AddListener(InventoryDismissButtonClicked);
 
         DateTime dateToClaimLives = inventoryData.GetDateToClaimLives();
@@ -139,6 +136,9 @@ public class StoreBehavior : MonoBehaviour
             Screen.autorotateToPortrait = true;
             Screen.autorotateToPortraitUpsideDown = false;
             landscapeCanvas.gameObject.SetActive(false);
+
+            portraitBackButton.onClick.AddListener(ReturnToMenuButtonClicked);
+            portraitInventoryButton.onClick.AddListener(InventoryButtonClicked);
 
             portraitCoinIAP1PriceText.text = GetPriceForItem(IAP_IDS.coinIAP1);
             portraitCoinIAP2PriceText.text = GetPriceForItem(IAP_IDS.coinIAP2);
@@ -170,6 +170,9 @@ public class StoreBehavior : MonoBehaviour
             Screen.autorotateToPortrait = false;
             Screen.autorotateToPortraitUpsideDown = false;
             portraitCanvas.gameObject.SetActive(false);
+
+            landscapeBackButton.onClick.AddListener(ReturnToMenuButtonClicked);
+            landscapeInventoryButton.onClick.AddListener(InventoryButtonClicked);
 
             landscapeCoinIAP1PriceText.text = GetPriceForItem(IAP_IDS.coinIAP1);
             landscapeCoinIAP2PriceText.text = GetPriceForItem(IAP_IDS.coinIAP2);

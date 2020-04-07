@@ -5,6 +5,7 @@ public class FooterButtonsBehavior : MonoBehaviour
 {
     public Button exitButton;
     public Button inventoryButton;
+    public Button storeButton;
 
     public GameObject notificationCanvasPrefab;
     private GameObject inventoryNotification;

@@ -9,6 +9,10 @@ public class LevelSelectorBehavior : MonoBehaviour
     public Canvas portraitCanvas;
     public Canvas landscapeCanvas;
 
+    public GameObject inventoryCanvasPrefab;
+    private GameObject inventoryCanvas;
+    private InventoryCanvasBehavior inventoryCanvasScript;
+
     // Items pertaining to the Sky Series levels
     private LevelData levelData;
     public Sprite skySeriesUnlockedLevelSprite;
@@ -22,6 +26,8 @@ public class LevelSelectorBehavior : MonoBehaviour
 
     // Landscape canvas items
     public Button landscapeReturnToMenuButton;
+    public Button landscapeInventoryButton;
+    public Button landscapeStoreButton;
     public GameObject landscapeHowtoPopup;
     public Button landscapeHowtoNextButton1;
     public Button landscapeHowtoNextButton2;
@@ -67,6 +73,8 @@ public class LevelSelectorBehavior : MonoBehaviour
 
     // Portrait canvas items
     public Button portraitReturnToMenuButton;
+    public Button portraitInventoryButton;
+    public Button portraitStoreButton;
     public GameObject portraitHowtoPopup;
     public Button portraitHowtoNextButton1;
     public Button portraitHowtoNextButton2;
@@ -118,6 +126,11 @@ public class LevelSelectorBehavior : MonoBehaviour
     void Awake()
     {
         levelChangerScript = levelChanger.GetComponent<LevelChanger>();
+
+        inventoryCanvas = Instantiate(inventoryCanvasPrefab);
+        inventoryCanvasScript = inventoryCanvas.GetComponent<InventoryCanvasBehavior>();
+        inventoryCanvasScript.inventoryDismissButton.onClick.AddListener(InventoryCanvasDismissed);
+        inventoryCanvas.gameObject.SetActive(false);
     }
 
     // Start is called before the first frame update
@@ -136,6 +149,8 @@ public class LevelSelectorBehavior : MonoBehaviour
             landscapeCanvas.gameObject.SetActive(false);
 
             portraitReturnToMenuButton.onClick.AddListener(ReturnToMenuButtonClicked);
+            portraitStoreButton.onClick.AddListener(StoreButtonClicked);
+            portraitInventoryButton.onClick.AddListener(InventoryButtonClicked);
 
             // Determine whether or not to show the "how to play" popup
             if (PlayerPrefsCommon.GetHowtoPopup() == 0)
@@ -296,6 +311,8 @@ public class LevelSelectorBehavior : MonoBehaviour
             portraitCanvas.gameObject.SetActive(false);
 
             landscapeReturnToMenuButton.onClick.AddListener(ReturnToMenuButtonClicked);
+            landscapeStoreButton.onClick.AddListener(StoreButtonClicked);
+            landscapeInventoryButton.onClick.AddListener(InventoryButtonClicked);
 
             // Determine whether or not to show the "how to play" popup
             if (PlayerPrefsCommon.GetHowtoPopup() == 0)
@@ -446,9 +463,24 @@ public class LevelSelectorBehavior : MonoBehaviour
         }
     }
 
+    private void InventoryCanvasDismissed()
+    {
+        inventoryCanvas.gameObject.SetActive(false);
+    }
+
     private void ReturnToMenuButtonClicked()
     {
         levelChangerScript.FadeToPreviousScene();
+    }
+
+    private void StoreButtonClicked()
+    {
+        levelChangerScript.FadeToScene("StoreScene");
+    }
+
+    private void InventoryButtonClicked()
+    {
+        inventoryCanvas.gameObject.SetActive(true);
     }
 
     private void DismissPopupButtonClicked(Button button)
