@@ -202,7 +202,7 @@ public class StoreBehavior : MonoBehaviour
 
         if (diffTime.Ticks < 0)
         {
-            timerText.text = "00:00:00";
+            timerText.text = "FREE";
         }
         else
         {
