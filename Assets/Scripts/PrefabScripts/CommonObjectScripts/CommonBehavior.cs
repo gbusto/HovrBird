@@ -177,8 +177,16 @@ public class CommonBehavior : MonoBehaviour
 
         // Add code to deactivate pause button when another menu is showing
         playCanvasScript.pauseButton.onClick.AddListener(pauseButtonClicked);
-        playCanvasScript.heartImage.sprite = playCanvasScript.fullLifeSprite;
-        playCanvasScript.lifeCountText.text = "x" + lifeCount.ToString();
+        if (lifeCount > 0)
+        {
+            playCanvasScript.heartImage.sprite = playCanvasScript.fullLifeSprite;
+            playCanvasScript.lifeCountText.text = "x" + lifeCount.ToString();
+        }
+        else
+        {
+            playCanvasScript.heartImage.sprite = playCanvasScript.noLifeSprite;
+            playCanvasScript.lifeCountText.text = ""; // Leave this string empty
+        }
         playCanvas.gameObject.SetActive(false);
 
         pauseMenu = Instantiate(pauseMenuPrefab);
