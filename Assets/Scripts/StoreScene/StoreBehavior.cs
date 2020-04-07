@@ -203,14 +203,17 @@ public class StoreBehavior : MonoBehaviour
         DateTime dateToClaimLives = inventoryData.GetDateToClaimLives();
         diffTime = dateToClaimLives.Subtract(DateTime.Now);
 
-        if (diffTime.Ticks < 0)
+        if (null != timerText)
         {
-            timerText.text = "FREE";
-        }
-        else
-        {
-            string[] substrings = diffTime.ToString().Split('.');
-            timerText.text = substrings[0];
+            if (diffTime.Ticks < 0)
+            {
+                timerText.text = "FREE";
+            }
+            else
+            {
+                string[] substrings = diffTime.ToString().Split('.');
+                timerText.text = substrings[0];
+            }
         }
     }
 
@@ -249,15 +252,31 @@ public class StoreBehavior : MonoBehaviour
                 return "$4.99";
 
             case IAP_IDS.birdIAP1:
+                if (inventoryData.IsBirdInInventory(InventoryData.ANGRY_KOKO_ID))
+                {
+                    return "Purchased";
+                }
                 return "$0.99";
 
             case IAP_IDS.birdIAP2:
+                if (inventoryData.IsBirdInInventory(InventoryData.ANGRY_SAM_ID))
+                {
+                    return "Purchased";
+                }
                 return "$0.99";
 
             case IAP_IDS.birdIAP3:
+                if (inventoryData.IsBirdInInventory(InventoryData.ANGRY_NIGEL_ID))
+                {
+                    return "Purchased";
+                }
                 return "$0.99";
 
             case IAP_IDS.birdIAP4:
+                if (inventoryData.IsBirdInInventory(InventoryData.ANGRY_STEVEN_ID))
+                {
+                    return "Purchased";
+                }
                 return "$0.99";
         }
 
